@@ -2,17 +2,25 @@ package pl.lodz.p.navapp;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,8 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+    public static final int MAX_ZOOM_LEVEL = 20;
+    public static final int ZOOMLEVEL = 17;
+    String locationProvider;
     private MapView mMapView;
     private MapController mMapController;
+    LocationManager locationManager;
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
 
     @Override
@@ -31,12 +43,36 @@ public class MainActivity extends AppCompatActivity {
             checkPermissions();
         }
         setContentView(R.layout.activity_main);
+        setupMap();
+
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabLocation);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                locationProvider = LocationManager.NETWORK_PROVIDER;
+                Location myLocation = locationManager.getLastKnownLocation(locationProvider);
+                if(myLocation !=null){
+                    GeoPoint gPt = new GeoPoint(myLocation.getLatitude(),myLocation.getLongitude());
+                    mMapController.animateTo(gPt);
+                }
+            }
+        });
+    }
+
+    private void setupMap() {
         mMapView = (MapView) findViewById(R.id.mapview);
         mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-        mMapView.setBuiltInZoomControls(true);
-        mMapView.setMaxZoomLevel(19);
+        mMapView.setMaxZoomLevel(MAX_ZOOM_LEVEL);
+        mMapView.setMultiTouchControls(true);
+
         mMapController = (MapController) mMapView.getController();
-        mMapController.setZoom(14);
+        mMapController.setZoom(ZOOMLEVEL);
         GeoPoint gPt = new GeoPoint(51.746340, 19.450110);
         mMapController.setCenter(gPt);
     }
