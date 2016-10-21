@@ -3,6 +3,7 @@ package pl.lodz.p.navapp;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -22,6 +23,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabLocation);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fabLocation = (FloatingActionButton) findViewById(R.id.fabLocation);
+        fabLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -57,10 +59,19 @@ public class MainActivity extends AppCompatActivity {
                 }
                 locationProvider = LocationManager.NETWORK_PROVIDER;
                 Location myLocation = locationManager.getLastKnownLocation(locationProvider);
-                if(myLocation !=null){
-                    GeoPoint gPt = new GeoPoint(myLocation.getLatitude(),myLocation.getLongitude());
+                if (myLocation != null) {
+                    GeoPoint gPt = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
                     mMapController.animateTo(gPt);
                 }
+            }
+        });
+
+        FloatingActionButton fabTimetable = (FloatingActionButton) findViewById(R.id.fabTimetable);
+        fabTimetable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent timetableIntent = new Intent(getApplicationContext(), TimetableActivity.class);
+                startActivity(timetableIntent);
             }
         });
     }
