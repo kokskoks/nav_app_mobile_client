@@ -14,9 +14,9 @@
         android:layout_height="wrap_content">
 
         <AutoCompleteTextView
-            android:id="@+id/username"
+            android:id="@+id/autocompleteLocation"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:background="@drawable/textinputborder"
             android:textColor="#000000"
             />
