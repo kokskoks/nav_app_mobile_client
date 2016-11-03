@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="pl.lodz.p.navapp.TimetableActivity">
+    tools:context="pl.lodz.p.navapp.activity.TimetableActivity">
 
     <TextView
         android:text="Plan zajęć"

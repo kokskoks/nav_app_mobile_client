@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Nav App</string>
     <string name="buldingNamePrompt">Wprowadź nazwę wydziału...</string>
+    <string name="currentLocation">Obecna lokacja</string>
 </resources>

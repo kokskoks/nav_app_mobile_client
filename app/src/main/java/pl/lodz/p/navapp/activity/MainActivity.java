@@ -1,4 +1,4 @@
-package pl.lodz.p.navapp;
+package pl.lodz.p.navapp.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -31,7 +33,11 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
+import pl.lodz.p.navapp.PlaceInfo;
+import pl.lodz.p.navapp.R;
 
 public class MainActivity extends AppCompatActivity {
     public static final int MAX_ZOOM_LEVEL = 20;
@@ -82,8 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 locationProvider = LocationManager.NETWORK_PROVIDER;
                 Location myLocation = locationManager.getLastKnownLocation(locationProvider);
                 if (myLocation != null) {
-                    GeoPoint gPt = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
-                    mMapController.animateTo(gPt);
+                    addCurrentLocationMarker(myLocation);
                 }
             }
         });
@@ -157,6 +162,32 @@ public class MainActivity extends AppCompatActivity {
         mMapView.getOverlays().add(marker);
         mMapView.invalidate();
         mMapController.animateTo(point);
+    }
+
+    public void addCurrentLocationMarker(Location myLocation) {
+        try {
+            Geocoder geo = new Geocoder(MainActivity.this.getApplicationContext(), Locale.getDefault());
+            List<Address> addresses = geo.getFromLocation(myLocation.getLatitude(), myLocation.getLongitude(), 1);
+            if (addresses.size() > 0) {
+                mMapView.getOverlays().clear();
+                Marker marker = new Marker(mMapView);
+                GeoPoint point = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
+                marker.setPosition(point);
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
+                marker.setTitle(getString(R.string.currentLocation));
+                marker.setSubDescription(addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName());
+                mMapView.getOverlays().clear();
+                mMapView.getOverlays().add(marker);
+                mMapView.invalidate();
+                mMapController.animateTo(point);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        GeoPoint gPt = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
+        mMapController.animateTo(gPt);
+
     }
 
     // Request permissions to support Android Marshmallow and above devices  (api-23)

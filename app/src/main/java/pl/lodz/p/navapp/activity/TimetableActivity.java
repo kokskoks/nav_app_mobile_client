@@ -1,9 +1,12 @@
-package pl.lodz.p.navapp;
+package pl.lodz.p.navapp.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import pl.lodz.p.navapp.R;
+
 
 public class TimetableActivity extends AppCompatActivity {
 
