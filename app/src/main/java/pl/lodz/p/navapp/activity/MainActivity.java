@@ -2,191 +2,113 @@ package pl.lodz.p.navapp.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
-
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapController;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import pl.lodz.p.navapp.PlaceInfo;
+import pl.lodz.p.navapp.OnFragmentInteractionListener;
+import pl.lodz.p.navapp.fragment.MapFragment;
 import pl.lodz.p.navapp.R;
+import pl.lodz.p.navapp.fragment.TimetableFragment;
 
-public class MainActivity extends AppCompatActivity {
-    public static final int MAX_ZOOM_LEVEL = 20;
-    public static final int ZOOMLEVEL = 17;
-    String locationProvider;
-    private MapView mMapView;
-    private MapController mMapController;
-    LocationManager locationManager;
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
-    List<PlaceInfo> placesList;
-    AutoCompleteTextView autocompleteLocation;
-    String[] names;
-    String[] addresses;
-    double[] lat;
-    double[] lon;
-    List<Drawable> images;
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        placesList = new ArrayList<>();
+        setContentView(R.layout.activity_main);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions();
         }
-        setContentView(R.layout.activity_main);
-        setupMap();
-        createData();
 
-        autocompleteLocation = (AutoCompleteTextView) findViewById(R.id.autocompleteLocation);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names);
-        autocompleteLocation.setAdapter(adapter);
-        autocompleteLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                addMarker(i);
-            }
-        });
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        FloatingActionButton fabLocation = (FloatingActionButton) findViewById(R.id.fabLocation);
-        fabLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
 
-                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                locationProvider = LocationManager.NETWORK_PROVIDER;
-                Location myLocation = locationManager.getLastKnownLocation(locationProvider);
-                if (myLocation != null) {
-                    addCurrentLocationMarker(myLocation);
-                }
-            }
-        });
-
-        FloatingActionButton fabTimetable = (FloatingActionButton) findViewById(R.id.fabTimetable);
-        fabTimetable.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent timetableIntent = new Intent(getApplicationContext(), TimetableActivity.class);
-                startActivity(timetableIntent);
-            }
-        });
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
-    private void createData() {
-        images = new ArrayList<>();
-        Resources resources = getResources();
-        images.add(resources.getDrawable(R.drawable.weeia));
-        images.add(resources.getDrawable(R.drawable.mech));
-        images.add(resources.getDrawable(R.drawable.chem));
-        images.add(resources.getDrawable(R.drawable.mech));
-        images.add(resources.getDrawable(R.drawable.mech_fabryka_inz));
-        images.add(resources.getDrawable(R.drawable.chem));
-        images.add(resources.getDrawable(R.drawable.ife));
-        images.add(resources.getDrawable(R.drawable.binoz));
-        images.add(resources.getDrawable(R.drawable.weeia));
-        images.add(resources.getDrawable(R.drawable.weeia));
-        images.add(resources.getDrawable(R.drawable.ipos));
-        images.add(resources.getDrawable(R.drawable.binoz));
-        images.add(resources.getDrawable(R.drawable.rekrutacja));
-        images.add(resources.getDrawable(R.drawable.wzornictwa));
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
-        names = new String[]{"Wydział Elektrotechniki Elektroniki Informatyki i Automatyki", "Wydział Mechaniczny", "Wydział Chemiczny", "Wydział Mechaniczny",
-                "Wydział Mechaniczny - Fabryka Inżynierów", "Instytut Chemi Ogólnej i Ekologicznej", "Centrum Kształcenia Międzynarodowego"
-                , "Wydział Biotechnologii i nauk o żywności", "Katedra aparatury przemysłowej", "Instytut Mechatroniki i Systemów Informatycznych",
-                "Wydział Inżynierii Procesowej i Ochrony środowiska", "Wydział Biotechnologii i nauk o żywności", "Rekrutacja", "Wydział Technologii Materiałowych i Wzornictwa Tekstyliów"};
-        addresses = new String[]{"Stefanowskiego 18/22", "Stefanowskiego 1/15", "Żeromskiego 116", "Stefanowskiego 1/15", "Stefanowskiego 2", "Żeromskiego 116", "Żwirki 36",
-                "Stefanowskiego", "Stefanowskiego 12/16", "Stefanowskiego 18/22", "Wólczańska 213", "Wólczańska 171/173", "Stefanowskiego 18/22", "Żeromskiego 116"};
-        lat = new double[]{51.75252299, 51.75284959, 51.75365549, 51.75373305, 51.75495143, 51.75424923, 51.75503501, 51.75472001, 51.75370351, 51.7537103, 51.75412276, 51.75448702, 51.75259608, 51.75283733};
-        lon = new double[]{19.45303313, 19.45258552, 19.45091179, 19.45180004, 19.45124336, 19.45077855, 19.45152691, 19.45264238, 19.4529498, 19.45394666, 19.45414356, 19.45450147, 19.45366977, 19.4502742};
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
 
-        for (int i = 0; i < names.length; i++) {
-            placesList.add(new PlaceInfo(names[i], addresses[i], lat[i], lon[i]));
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
         }
 
+        return super.onOptionsItemSelected(item);
     }
 
-    private void setupMap() {
-        mMapView = (MapView) findViewById(R.id.mapview);
-        mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-        mMapView.setMaxZoomLevel(MAX_ZOOM_LEVEL);
-        mMapView.setMultiTouchControls(true);
-        mMapView.setClickable(true);
-        mMapController = (MapController) mMapView.getController();
-        mMapController.setZoom(ZOOMLEVEL);
-        GeoPoint gPt = new GeoPoint(51.745649, 19.454488);
-        mMapController.setCenter(gPt);
-    }
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
 
-    public void addMarker(int id) {
-        mMapView.getOverlays().clear();
-        Marker marker = new Marker(mMapView);
-        GeoPoint point = placesList.get(id).getGeoPoint();
-        marker.setPosition(point);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
-        marker.setTitle(placesList.get(id).getTitle());
-        marker.setSubDescription(placesList.get(id).getSubDescription());
-        marker.setImage(images.get(id));
-        mMapView.getOverlays().clear();
-        mMapView.getOverlays().add(marker);
-        mMapView.invalidate();
-        mMapController.animateTo(point);
-    }
-
-    public void addCurrentLocationMarker(Location myLocation) {
-        try {
-            Geocoder geo = new Geocoder(MainActivity.this.getApplicationContext(), Locale.getDefault());
-            List<Address> addresses = geo.getFromLocation(myLocation.getLatitude(), myLocation.getLongitude(), 1);
-            if (addresses.size() > 0) {
-                mMapView.getOverlays().clear();
-                Marker marker = new Marker(mMapView);
-                GeoPoint point = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
-                marker.setPosition(point);
-                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
-                marker.setTitle(getString(R.string.currentLocation));
-                marker.setSubDescription(addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName());
-                mMapView.getOverlays().clear();
-                mMapView.getOverlays().add(marker);
-                mMapView.invalidate();
-                mMapController.animateTo(point);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (id == R.id.nav_map) {
+            MapFragment mapFragment = new MapFragment();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, mapFragment);
+            fragmentTransaction.commit();
+        } else if (id == R.id.nav_timetable) {
+            TimetableFragment timetableFragment = new TimetableFragment();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, timetableFragment);
+            fragmentTransaction.commit();
         }
-        GeoPoint gPt = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
-        mMapController.animateTo(gPt);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
 
     }
 
