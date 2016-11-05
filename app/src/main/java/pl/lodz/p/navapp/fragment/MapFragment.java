@@ -14,9 +14,13 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -39,6 +43,7 @@ public class MapFragment extends Fragment {
     public static final int MAX_ZOOM_LEVEL = 20;
     public static final int ZOOMLEVEL = 17;
     LocationManager locationManager;
+    private SearchView search;
     private OnFragmentInteractionListener mListener;
     List<PlaceInfo> placesList;
     String[] names;
@@ -46,6 +51,7 @@ public class MapFragment extends Fragment {
     double[] lat;
     double[] lon;
     List<Drawable> images;
+    AutoCompleteTextView autocompleteLocation;
 
     public MapFragment() {
         // Required empty public constructor
@@ -57,6 +63,7 @@ public class MapFragment extends Fragment {
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         placesList = new ArrayList<>();
         createData();
+
 
     }
 
@@ -107,7 +114,15 @@ public class MapFragment extends Fragment {
                 }
             }
         });
-
+        autocompleteLocation = (AutoCompleteTextView) getActivity().findViewById(R.id.mySearchView);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, names);
+        autocompleteLocation.setAdapter(adapter);
+        autocompleteLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                addMarker(i);
+            }
+        });
         return view;
     }
 
