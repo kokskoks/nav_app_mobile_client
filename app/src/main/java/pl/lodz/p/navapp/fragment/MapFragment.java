@@ -21,12 +21,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Toast;
 
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +40,7 @@ import java.util.Locale;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.PlaceInfo;
 import pl.lodz.p.navapp.R;
+import pl.lodz.p.navapp.RouteFinder;
 
 public class MapFragment extends Fragment {
     private MapView mMapView;
@@ -52,10 +58,17 @@ public class MapFragment extends Fragment {
     double[] lon;
     List<Drawable> images;
     AutoCompleteTextView autocompleteLocation;
+    GeoPoint currentPoint;
 
-    public MapFragment() {
-        // Required empty public constructor
+    private static MapFragment instance = null;
+
+    public static MapFragment getInstance(){
+        if(instance == null){
+            instance = new MapFragment();
+        }
+        return instance;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +84,7 @@ public class MapFragment extends Fragment {
         mMapView.getOverlays().clear();
         Marker marker = new Marker(mMapView);
         GeoPoint point = placesList.get(id).getGeoPoint();
+        this.currentPoint = point;
         marker.setPosition(point);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
@@ -100,6 +114,35 @@ public class MapFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         setupMap(view);
+
+
+
+
+        FloatingActionButton fabNavigate = (FloatingActionButton) view.findViewById(R.id.fabNavigate);
+        fabNavigate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                locationProvider = LocationManager.NETWORK_PROVIDER;
+                Location myLocation = locationManager.getLastKnownLocation(locationProvider);
+                if(myLocation != null){
+                    ArrayList<GeoPoint> waypoints = new ArrayList<>();
+                    GeoPoint gPt = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
+                    waypoints.add(gPt);
+
+                    waypoints.add(currentPoint);
+
+                    new RouteFinder(MapFragment.getInstance()).execute(waypoints);
+                }
+                else {
+                    Toast toast = Toast.makeText(getContext(), "Obecna lokalizacja nieznana", Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+        });
+
         FloatingActionButton fabLocation = (FloatingActionButton) view.findViewById(R.id.fabLocation);
         fabLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,4 +252,9 @@ public class MapFragment extends Fragment {
 
     }
 
+    public void drawRoute(Road road) {
+        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+        mMapView.getOverlays().add(roadOverlay);
+        mMapView.invalidate();
+    }
 }

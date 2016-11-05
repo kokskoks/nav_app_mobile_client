@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions();
         }
-        MapFragment mapFragment = new MapFragment();
+        MapFragment mapFragment = MapFragment.getInstance();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, mapFragment);
         fragmentTransaction.commit();
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_map) {
-            MapFragment mapFragment = new MapFragment();
+            MapFragment mapFragment = MapFragment.getInstance();
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, mapFragment);
             fragmentTransaction.commit();
