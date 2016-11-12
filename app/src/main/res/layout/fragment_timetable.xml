@@ -24,35 +24,35 @@
                 <TextView
                     android:gravity="center"
                     android:padding="3dip"
-                    android:text="Pon"
+                    android:text="Poniedziałek"
                     android:textSize="18sp"
                     android:textStyle="normal|bold" />
 
                 <TextView
                     android:gravity="center"
                     android:padding="3dip"
-                    android:text="Wt"
+                    android:text="Wtorek"
                     android:textSize="18sp"
                     android:textStyle="normal|bold" />
 
                 <TextView
                     android:gravity="center"
                     android:padding="3dip"
-                    android:text="Śr"
+                    android:text="Środa"
                     android:textSize="18sp"
                     android:textStyle="normal|bold" />
 
                 <TextView
                     android:gravity="center"
                     android:padding="3dip"
-                    android:text="Czw"
+                    android:text="Czwartek"
                     android:textSize="18sp"
                     android:textStyle="normal|bold" />
 
                 <TextView
                     android:gravity="center"
                     android:padding="3dip"
-                    android:text="Pt"
+                    android:text="Piątek"
                     android:textSize="18sp"
                     android:textStyle="normal|bold" />
             </TableRow>
