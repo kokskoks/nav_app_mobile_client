@@ -16,9 +16,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -60,7 +62,7 @@ public class MapFragment extends Fragment {
     private String[] names;
     private List<Drawable> images;
     private AutoCompleteTextView autocompleteLocation;
-    private GeoPoint currentPoint;
+    boolean fromCurrentLocation = true;
 
     private static MapFragment instance = null;
 
@@ -80,21 +82,23 @@ public class MapFragment extends Fragment {
         createData();
     }
 
-    public void addMarker(int id) {
-        mMapView.getOverlays().clear();
+    public void addMarker(PlaceInfo place, boolean buildingInfoMarker) {
         Marker marker = new Marker(mMapView);
-        GeoPoint point = placesList.get(id).getGeoPoint();
-        this.currentPoint = point;
+        GeoPoint point = place.getGeoPoint();
         marker.setPosition(point);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
-        marker.setTitle(placesList.get(id).getTitle());
-        marker.setSubDescription(placesList.get(id).getSubDescription());
-        marker.setImage(images.get(id));
-        mMapView.getOverlays().clear();
+        marker.setTitle(place.getTitle());
+        marker.setSubDescription(place.getSubDescription());
+        marker.setImage(images.get(place.getID()));
+        if (buildingInfoMarker) {
+            mMapView.getOverlays().clear();
+        }
         mMapView.getOverlays().add(marker);
         mMapView.invalidate();
-        mMapController.animateTo(point);
+        if(buildingInfoMarker){
+            mMapController.animateTo(point);
+        }
     }
 
     private void setupMap(View view) {
@@ -123,13 +127,13 @@ public class MapFragment extends Fragment {
                 initDialog(dialog);
             }
         });
-        FloatingActionButton fabLocation = (FloatingActionButton) view.findViewById(R.id.fabLocation);
+        final FloatingActionButton fabLocation = (FloatingActionButton) view.findViewById(R.id.fabLocation);
         fabLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Location myLocation = findCurrentLocation();
-                if (myLocation != null) {
-                    addCurrentLocationMarker(myLocation);
+                PlaceInfo currentLocation = findCurrentLocation();
+                if (currentLocation != null) {
+                    addCurrentLocationMarker(currentLocation,false);
                 }
             }
         });
@@ -139,25 +143,30 @@ public class MapFragment extends Fragment {
         autocompleteLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                addMarker(i);
+                addMarker(placesList.get(i), true);
+                if (view != null) {
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
             }
         });
         return view;
     }
 
-    private Location findCurrentLocation() {
+    private PlaceInfo findCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return null;
         }
-        return locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        return new PlaceInfo(currentLocation);
     }
 
-    private void drawPath(GeoPoint from, GeoPoint to, int type, boolean fromCurrent) {
+    private void drawPath(GeoPoint from, GeoPoint to, int type) {
         NavigationInfo info = new NavigationInfo();
         ArrayList<GeoPoint> waypoints = new ArrayList<>();
         waypoints.add(from);
         waypoints.add(to);
-        switch(type){
+        switch (type) {
             case R.id.bicycleRadioButton:
                 info.setRouteType("bicycle");
                 break;
@@ -170,12 +179,6 @@ public class MapFragment extends Fragment {
         }
         info.setWaypoints(waypoints);
         new RouteFinder(MapFragment.getInstance()).execute(info);
-        if(fromCurrent){
-            Location currLocation = new Location(LocationManager.NETWORK_PROVIDER);
-            currLocation.setLatitude(from.getLatitude());
-            currLocation.setLongitude(from.getLongitude());
-            addCurrentLocationMarker(currLocation);
-        }
         mMapController.animateTo(from);
     }
 
@@ -206,9 +209,9 @@ public class MapFragment extends Fragment {
             public void onClick(View view) {
                 String fromLocation = dialogFromLocation.getText().toString();
                 String toLocation = dialogToLocation.getText().toString();
-                if(fromLocation.isEmpty() || toLocation.isEmpty()){
-                    Toast.makeText(getContext(),"Wprowadź dane",Toast.LENGTH_SHORT).show();
-                }else {
+                if (fromLocation.isEmpty() || toLocation.isEmpty()) {
+                    Toast.makeText(getContext(), "Wprowadź dane", Toast.LENGTH_SHORT).show();
+                } else {
                     for (PlaceInfo place : placesList) {
                         if (toLocation.equalsIgnoreCase(place.getTitle())) {
                             to = place;
@@ -218,45 +221,44 @@ public class MapFragment extends Fragment {
                         }
                     }
                     if (currentLocation.isChecked()) {
-                        Location currentPosition = findCurrentLocation();
+                        PlaceInfo currentPosition = findCurrentLocation();
                         if (currentPosition != null) {
-                            drawPath(new GeoPoint(currentPosition.getLatitude(), currentPosition.getLongitude()), to.getGeoPoint(), locationType.getCheckedRadioButtonId(),true);
+                            fromCurrentLocation = true;
+                            from = currentPosition;
                         }
                     } else {
-                        drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId(),false);
+                        fromCurrentLocation = false;
                     }
+                    drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId());
                     dialog.dismiss();
                 }
             }
         });
-        dialog.setTitle("Title...");
         dialog.show();
     }
 
-    public void addCurrentLocationMarker(Location myLocation) {
+    public void addCurrentLocationMarker(PlaceInfo place, boolean forNavigation) {
         try {
             Geocoder geo = new Geocoder(getContext(), Locale.getDefault());
-            List<Address> addresses = geo.getFromLocation(myLocation.getLatitude(), myLocation.getLongitude(), 1);
-            if (addresses.size() > 0) {
-                mMapView.getOverlays().clear();
+            GeoPoint currentLocationGeoPoint = place.getGeoPoint();
+            List<Address> addresses = geo.getFromLocation(currentLocationGeoPoint.getLatitude(),currentLocationGeoPoint.getLongitude(), 1);
+            if (!addresses.isEmpty()) {
                 Marker marker = new Marker(mMapView);
-                GeoPoint point = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
-                marker.setPosition(point);
+                marker.setPosition(currentLocationGeoPoint);
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
                 marker.setTitle(getString(R.string.currentLocation));
                 marker.setSubDescription(addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName());
-                mMapView.getOverlays().clear();
+                if(!forNavigation){
+                    mMapView.getOverlays().clear();
+                }
                 mMapView.getOverlays().add(marker);
                 mMapView.invalidate();
-                mMapController.animateTo(point);
+                mMapController.animateTo(currentLocationGeoPoint);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("Error",e.getMessage());
         }
-        GeoPoint gPt = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
-        mMapController.animateTo(gPt);
-
     }
 
     public void onButtonPressed(Uri uri) {
@@ -310,7 +312,7 @@ public class MapFragment extends Fragment {
         double[] lon = new double[]{19.45303313, 19.45258552, 19.45091179, 19.45180004, 19.45124336, 19.45077855, 19.45152691, 19.45264238, 19.4529498, 19.45394666, 19.45414356, 19.45450147, 19.45366977, 19.4502742};
 
         for (int i = 0; i < names.length; i++) {
-            placesList.add(new PlaceInfo(i,names[i], addresses[i], lat[i], lon[i]));
+            placesList.add(new PlaceInfo(i, names[i], addresses[i], lat[i], lon[i]));
         }
 
     }
@@ -320,6 +322,12 @@ public class MapFragment extends Fragment {
         roadOverlay.setWidth(10);
         mMapView.getOverlays().clear();
         mMapView.getOverlays().add(roadOverlay);
+        if (fromCurrentLocation) {
+            addCurrentLocationMarker(from,true);
+        }else {
+            addMarker(from, false);
+        }
+        addMarker(to, false);
         mMapView.invalidate();
     }
 }

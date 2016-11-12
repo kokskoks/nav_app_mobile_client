@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.R;
@@ -16,7 +18,6 @@ public class TimetableFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     public TimetableFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -28,10 +29,12 @@ public class TimetableFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_timetable, container, false);
+        View view = inflater.inflate(R.layout.fragment_timetable, container, false);
+        AutoCompleteTextView autocompleteLocation = (AutoCompleteTextView) getActivity().findViewById(R.id.mySearchView);
+        autocompleteLocation.setAdapter(null);
+        return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);

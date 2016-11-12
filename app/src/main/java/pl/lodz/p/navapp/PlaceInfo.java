@@ -1,5 +1,7 @@
 package pl.lodz.p.navapp;
 
+import android.location.Location;
+
 import org.osmdroid.util.GeoPoint;
 
 /**
@@ -18,6 +20,10 @@ public class PlaceInfo {
         this.title = title;
         this.subDescription = subDescription;
         this.geoPoint = new GeoPoint(lat,lon);
+    }
+
+    public PlaceInfo(Location myLocation) {
+        this.geoPoint = new GeoPoint(myLocation.getLatitude(),myLocation.getLongitude());
     }
 
     public int getDrawableID() {
