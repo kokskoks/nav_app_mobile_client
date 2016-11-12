@@ -1,50 +1,506 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="pl.lodz.p.navapp.fragment.TimetableFragment">
 
-    <TextView
-        android:text="Plan zajęć"
+    <ScrollView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textSize="36sp" />
+        android:layout_height="wrap_content">
 
-    <Button
-        android:text="Ok"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="95dp"
-        android:id="@+id/timetableOkButton"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@+id/grupa">
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <AutoCompleteTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Kierunek" />
-    </android.support.design.widget.TextInputLayout>
+                <TextView
+                    android:layout_column="0"
+                    android:padding="3dip"
+                    android:text="" />
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/grupa">
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Pon"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
 
-        <AutoCompleteTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Grupa" />
-    </android.support.design.widget.TextInputLayout>
-</RelativeLayout>
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Wt"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Śr"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Czw"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Pt"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="8:00-9:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="9:00-10:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="10:00-11:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="11:00-12:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="12:00-13:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="13:00-14:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="14:00-15:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="15:00-16:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="16:00-17:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="17:00-18:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="18:00-19:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="19:00-20:00"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+
+                <Button
+                    android:gravity="center"
+                    android:padding="3dip"
+                    android:text="Zajecie1" />
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+</HorizontalScrollView>
