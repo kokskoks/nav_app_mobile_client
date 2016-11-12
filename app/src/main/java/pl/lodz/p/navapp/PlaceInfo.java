@@ -7,12 +7,14 @@ import org.osmdroid.util.GeoPoint;
  */
 
 public class PlaceInfo {
+    private int ID;
     private String title;
     private String subDescription;
     private int drawableID;
     private GeoPoint geoPoint;
 
-    public PlaceInfo(String title, String subDescription, double lat, double lon) {
+    public PlaceInfo(int ID, String title, String subDescription, double lat, double lon) {
+        this.ID = ID;
         this.title = title;
         this.subDescription = subDescription;
         this.geoPoint = new GeoPoint(lat,lon);
@@ -48,5 +50,13 @@ public class PlaceInfo {
 
     public void setGeoPoint(GeoPoint geoPoint) {
         this.geoPoint = geoPoint;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
     }
 }

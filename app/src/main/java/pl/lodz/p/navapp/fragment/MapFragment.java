@@ -1,6 +1,7 @@
 package pl.lodz.p.navapp.fragment;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -14,16 +15,19 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.SearchView;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -37,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import pl.lodz.p.navapp.NavigationInfo;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.PlaceInfo;
 import pl.lodz.p.navapp.R;
@@ -45,25 +50,22 @@ import pl.lodz.p.navapp.RouteFinder;
 public class MapFragment extends Fragment {
     private MapView mMapView;
     private MapController mMapController;
-    String locationProvider;
     public static final int MAX_ZOOM_LEVEL = 20;
     public static final int ZOOMLEVEL = 17;
-    LocationManager locationManager;
-    private SearchView search;
+    private LocationManager locationManager;
     private OnFragmentInteractionListener mListener;
-    List<PlaceInfo> placesList;
-    String[] names;
-    String[] addresses;
-    double[] lat;
-    double[] lon;
-    List<Drawable> images;
-    AutoCompleteTextView autocompleteLocation;
-    GeoPoint currentPoint;
+    private List<PlaceInfo> placesList;
+    private PlaceInfo from;
+    private PlaceInfo to;
+    private String[] names;
+    private List<Drawable> images;
+    private AutoCompleteTextView autocompleteLocation;
+    private GeoPoint currentPoint;
 
     private static MapFragment instance = null;
 
-    public static MapFragment getInstance(){
-        if(instance == null){
+    public static MapFragment getInstance() {
+        if (instance == null) {
             instance = new MapFragment();
         }
         return instance;
@@ -76,8 +78,6 @@ public class MapFragment extends Fragment {
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         placesList = new ArrayList<>();
         createData();
-
-
     }
 
     public void addMarker(int id) {
@@ -115,50 +115,26 @@ public class MapFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         setupMap(view);
 
-
-
-
         FloatingActionButton fabNavigate = (FloatingActionButton) view.findViewById(R.id.fabNavigate);
         fabNavigate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                locationProvider = LocationManager.NETWORK_PROVIDER;
-                Location myLocation = locationManager.getLastKnownLocation(locationProvider);
-                if(myLocation != null){
-                    ArrayList<GeoPoint> waypoints = new ArrayList<>();
-                    GeoPoint gPt = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
-                    waypoints.add(gPt);
-
-                    waypoints.add(currentPoint);
-
-                    new RouteFinder(MapFragment.getInstance()).execute(waypoints);
-                }
-                else {
-                    Toast toast = Toast.makeText(getContext(), "Obecna lokalizacja nieznana", Toast.LENGTH_LONG);
-                    toast.show();
-                }
+                final Dialog dialog = new Dialog(getContext());
+                initDialog(dialog);
             }
         });
-
         FloatingActionButton fabLocation = (FloatingActionButton) view.findViewById(R.id.fabLocation);
         fabLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                locationProvider = LocationManager.NETWORK_PROVIDER;
-                Location myLocation = locationManager.getLastKnownLocation(locationProvider);
+                Location myLocation = findCurrentLocation();
                 if (myLocation != null) {
                     addCurrentLocationMarker(myLocation);
                 }
             }
         });
         autocompleteLocation = (AutoCompleteTextView) getActivity().findViewById(R.id.mySearchView);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, names);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, names);
         autocompleteLocation.setAdapter(adapter);
         autocompleteLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -167,6 +143,94 @@ public class MapFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private Location findCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return null;
+        }
+        return locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+    }
+
+    private void drawPath(GeoPoint from, GeoPoint to, int type, boolean fromCurrent) {
+        NavigationInfo info = new NavigationInfo();
+        ArrayList<GeoPoint> waypoints = new ArrayList<>();
+        waypoints.add(from);
+        waypoints.add(to);
+        switch(type){
+            case R.id.bicycleRadioButton:
+                info.setRouteType("bicycle");
+                break;
+            case R.id.carRadioButton:
+                info.setRouteType("fastest");
+                break;
+            default:
+                info.setRouteType("pedestrian");
+                break;
+        }
+        info.setWaypoints(waypoints);
+        new RouteFinder(MapFragment.getInstance()).execute(info);
+        if(fromCurrent){
+            Location currLocation = new Location(LocationManager.NETWORK_PROVIDER);
+            currLocation.setLatitude(from.getLatitude());
+            currLocation.setLongitude(from.getLongitude());
+            addCurrentLocationMarker(currLocation);
+        }
+        mMapController.animateTo(from);
+    }
+
+    private void initDialog(final Dialog dialog) {
+        dialog.setContentView(R.layout.navigation_dialog);
+        final AutoCompleteTextView dialogToLocation = (AutoCompleteTextView) dialog.findViewById(R.id.dialogToLocation);
+        final AutoCompleteTextView dialogFromLocation = (AutoCompleteTextView) dialog.findViewById(R.id.dialogFromLocation);
+        final CheckBox currentLocation = (CheckBox) dialog.findViewById(R.id.currentLocationCheckbox);
+        final RadioGroup locationType = (RadioGroup) dialog.findViewById(R.id.radioGroup);
+        currentLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked) {
+                    dialogFromLocation.setInputType(InputType.TYPE_NULL);
+                    dialogFromLocation.setText(R.string.currentLocation);
+                } else {
+                    dialogFromLocation.setInputType(InputType.TYPE_CLASS_TEXT);
+                    dialogFromLocation.setText("");
+                }
+            }
+        });
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, names);
+        dialogFromLocation.setAdapter(adapter);
+        dialogToLocation.setAdapter(adapter);
+        Button ok = (Button) dialog.findViewById(R.id.dialogOkButton);
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String fromLocation = dialogFromLocation.getText().toString();
+                String toLocation = dialogToLocation.getText().toString();
+                if(fromLocation.isEmpty() || toLocation.isEmpty()){
+                    Toast.makeText(getContext(),"Wprowadź dane",Toast.LENGTH_SHORT).show();
+                }else {
+                    for (PlaceInfo place : placesList) {
+                        if (toLocation.equalsIgnoreCase(place.getTitle())) {
+                            to = place;
+                        }
+                        if (fromLocation.equalsIgnoreCase(place.getTitle())) {
+                            from = place;
+                        }
+                    }
+                    if (currentLocation.isChecked()) {
+                        Location currentPosition = findCurrentLocation();
+                        if (currentPosition != null) {
+                            drawPath(new GeoPoint(currentPosition.getLatitude(), currentPosition.getLongitude()), to.getGeoPoint(), locationType.getCheckedRadioButtonId(),true);
+                        }
+                    } else {
+                        drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId(),false);
+                    }
+                    dialog.dismiss();
+                }
+            }
+        });
+        dialog.setTitle("Title...");
+        dialog.show();
     }
 
     public void addCurrentLocationMarker(Location myLocation) {
@@ -195,7 +259,6 @@ public class MapFragment extends Fragment {
 
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -241,19 +304,21 @@ public class MapFragment extends Fragment {
                 "Wydział Mechaniczny - Fabryka Inżynierów", "Instytut Chemi Ogólnej i Ekologicznej", "Centrum Kształcenia Międzynarodowego"
                 , "Wydział Biotechnologii i nauk o żywności", "Katedra aparatury przemysłowej", "Instytut Mechatroniki i Systemów Informatycznych",
                 "Wydział Inżynierii Procesowej i Ochrony środowiska", "Wydział Biotechnologii i nauk o żywności", "Rekrutacja", "Wydział Technologii Materiałowych i Wzornictwa Tekstyliów"};
-        addresses = new String[]{"Stefanowskiego 18/22", "Stefanowskiego 1/15", "Żeromskiego 116", "Stefanowskiego 1/15", "Stefanowskiego 2", "Żeromskiego 116", "Żwirki 36",
+        String[] addresses = new String[]{"Stefanowskiego 18/22", "Stefanowskiego 1/15", "Żeromskiego 116", "Stefanowskiego 1/15", "Stefanowskiego 2", "Żeromskiego 116", "Żwirki 36",
                 "Stefanowskiego", "Stefanowskiego 12/16", "Stefanowskiego 18/22", "Wólczańska 213", "Wólczańska 171/173", "Stefanowskiego 18/22", "Żeromskiego 116"};
-        lat = new double[]{51.75252299, 51.75284959, 51.75365549, 51.75373305, 51.75495143, 51.75424923, 51.75503501, 51.75472001, 51.75370351, 51.7537103, 51.75412276, 51.75448702, 51.75259608, 51.75283733};
-        lon = new double[]{19.45303313, 19.45258552, 19.45091179, 19.45180004, 19.45124336, 19.45077855, 19.45152691, 19.45264238, 19.4529498, 19.45394666, 19.45414356, 19.45450147, 19.45366977, 19.4502742};
+        double[] lat = new double[]{51.75252299, 51.75284959, 51.75365549, 51.75373305, 51.75495143, 51.75424923, 51.75503501, 51.75472001, 51.75370351, 51.7537103, 51.75412276, 51.75448702, 51.75259608, 51.75283733};
+        double[] lon = new double[]{19.45303313, 19.45258552, 19.45091179, 19.45180004, 19.45124336, 19.45077855, 19.45152691, 19.45264238, 19.4529498, 19.45394666, 19.45414356, 19.45450147, 19.45366977, 19.4502742};
 
         for (int i = 0; i < names.length; i++) {
-            placesList.add(new PlaceInfo(names[i], addresses[i], lat[i], lon[i]));
+            placesList.add(new PlaceInfo(i,names[i], addresses[i], lat[i], lon[i]));
         }
 
     }
 
     public void drawRoute(Road road) {
         Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+        roadOverlay.setWidth(10);
+        mMapView.getOverlays().clear();
         mMapView.getOverlays().add(roadOverlay);
         mMapView.invalidate();
     }

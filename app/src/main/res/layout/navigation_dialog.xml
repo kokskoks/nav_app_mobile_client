@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:text="Nawiguj"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:id="@+id/textView2"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textAlignment="center" />
+
+    <AutoCompleteTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialogToLocation"
+        android:layout_below="@+id/currentLocationCheckbox"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:maxLines="1"
+        android:inputType="text"/>
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/radioGroup"
+        android:layout_below="@+id/dialogToLocation"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <RadioButton
+            android:text="@string/pedestrian"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/pedestrianRadioButton"
+            android:checked="true" />
+        <RadioButton
+            android:text="@string/bicycle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bicycleRadioButton" />
+        <RadioButton
+            android:text="@string/car"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/carRadioButton" />
+    </RadioGroup>
+
+    <Button
+        android:text="OK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialogOkButton"
+        android:layout_below="@+id/radioGroup"
+        android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_my_location_black_24dp"
+        android:layout_above="@+id/dialogToLocation"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/imageView2"
+        android:layout_below="@+id/textView2" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/currentLocationCheckbox"
+        android:layout_below="@+id/textView2"
+        android:layout_toLeftOf="@+id/imageView2"
+        android:layout_toStartOf="@+id/imageView2" />
+
+    <AutoCompleteTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialogFromLocation"
+        android:layout_alignBaseline="@+id/currentLocationCheckbox"
+        android:layout_alignBottom="@+id/currentLocationCheckbox"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/currentLocationCheckbox"
+        android:layout_toStartOf="@+id/currentLocationCheckbox"
+        android:maxLines="1"
+        android:inputType="text"/>
+
+
+</RelativeLayout>

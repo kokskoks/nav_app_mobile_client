@@ -15,7 +15,7 @@ import pl.lodz.p.navapp.fragment.MapFragment;
 /**
  * Created by Kamil on 2016-11-05.
  */
-public class RouteFinder extends AsyncTask<ArrayList<GeoPoint>, Void, Road> {
+public class RouteFinder extends AsyncTask<NavigationInfo, Void, Road> {
 
     MapFragment mapFragment;
 
@@ -24,10 +24,12 @@ public class RouteFinder extends AsyncTask<ArrayList<GeoPoint>, Void, Road> {
     }
 
     @Override
-    protected Road doInBackground(ArrayList<GeoPoint>... params) {
+    protected Road doInBackground(NavigationInfo... params) {
+        NavigationInfo info = params[0];
+        ArrayList<GeoPoint> waypoints = (ArrayList<GeoPoint>) info.getWaypoints();
         RoadManager roadManager = new MapQuestRoadManager(mapFragment.getString(R.string.mapsKey));
-        roadManager.addRequestOption("routeType=pedestrian");
-        return roadManager.getRoad(params[0]);
+        roadManager.addRequestOption("routeType=" + info.getRouteType());
+        return roadManager.getRoad(waypoints);
     }
 
     @Override

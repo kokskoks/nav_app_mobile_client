@@ -11,4 +11,7 @@
     <string name="mapTitle">Mapa</string>
     <string name="timetableTitle">Plan zajęć</string>
     <string name="mapsKey">dI947NoGm3dIrjVymRV3Cn8qgYtIbtvD</string>
+    <string name="pedestrian">Piechota</string>
+    <string name="bicycle">Rower</string>
+    <string name="car">Samochód</string>
 </resources>
