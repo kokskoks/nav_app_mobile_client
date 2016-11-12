@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -49,7 +50,7 @@ import pl.lodz.p.navapp.PlaceInfo;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.RouteFinder;
 
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements LocationListener{
     private MapView mMapView;
     private MapController mMapController;
     public static final int MAX_ZOOM_LEVEL = 20;
@@ -329,5 +330,28 @@ public class MapFragment extends Fragment {
         }
         addMarker(to, false);
         mMapView.invalidate();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if(fromCurrentLocation) {
+            GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+            drawPath(newLocation, to.getGeoPoint(), R.id.pedestrianRadioButton);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
     }
 }
