@@ -2,6 +2,7 @@ package pl.lodz.p.navapp.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -34,16 +35,20 @@ import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.fragment.MapFragment;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.fragment.TimetableFragment;
+import pl.lodz.p.navapp.service.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
 
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
+    DatabaseHelper cordinatesDB;
+    Context context;
     private static final String url = "https://jsonplaceholder.typicode.com/posts/1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        cordinatesDB = new DatabaseHelper(this);
         setContentView(R.layout.activity_main);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions();
