@@ -1,21 +1,21 @@
 Kierunek;Semestr;Grupa;Przedmiot;Typ;Budynek;Sala;Dzieñ;Od;Do;Wyk³adowca;Tygodnie
-Informatyka;7;IO1;Seminarium dyplomowe;seminarium;A10;320;Poniedzia³ek;08:15;10:00;Sankowski D.;
+Informatyka;7;IO1;Seminarium dyplomowe;seminarium;A10;320;Poniedzia³ek;08:15;10:00;Sankowski D.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;IO1;Programowanie aplikacji webowych;wyk³ad;A10;E110;Czwartek;15:15;18:00;Adamus R.;1,2,3,4,5
 Informatyka;7;IO1;Programowanie aplikacji webowych;laboratorium;A10;E110;Czwartek;15:15;18:00;Adamus R.;6,7,8,9,10
-Informatyka;7;SS;Seminarium dyplomowe;seminarium;A10;320;Poniedzia³ek;12:15;14:00;Sankowski D.;
+Informatyka;7;SS;Seminarium dyplomowe;seminarium;A10;320;Poniedzia³ek;12:15;14:00;Sankowski D.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;SS;Podstawy teorii sygna³ów;wyk³ad;A10;C3;Czwartek;10:15;13:00;Ossowski M.;1,2,3,4,5
 Informatyka;7;SS;Podstawy teorii sygna³ów;laboratorium;A10;C3;Czwartek;10:15;13:00;Ossowski M.;6,7,8,9,10
-Informatyka;7;SS;System zarz¹dzania bezpieczeñstwem informacji i elementy prawne ;wyk³ad;A10;310;Czwartek;13:15;14:00;Nowakowski J.;
-Informatyka;7;TI1;Seminarium dyplomowe;seminarium;B18;A4;Poniedzia³ek;10:15;12:00;Napieralski A.;
-Informatyka;7;TI1;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;CTI;302;Czwartek;09:15;12:00;Orlikowski M.;
+Informatyka;7;SS;System zarz¹dzania bezpieczeñstwem informacji i elementy prawne ;wyk³ad;A10;310;Czwartek;13:15;14:00;Nowakowski J.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+Informatyka;7;TI1;Seminarium dyplomowe;seminarium;B18;A4;Poniedzia³ek;10:15;12:00;Napieralski A.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+Informatyka;7;TI1;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;CTI;302;Czwartek;09:15;12:00;Orlikowski M.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;TI1;Administracja i bezpieczeñstwo systemów sieciowych;wyk³ad;B18;A1;Czwartek;12:15;14:00;Orlikowski M.;3,4,5,6,7,8,9,10
-Informatyka;7;TI2;Seminarium dyplomowe;seminarium;B18;A3;Poniedzia³ek;08:15;10:00;Napieralski A.;
-Informatyka;7;TI2;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;CTI;302;Poniedzia³ek;16:15;20:00;Nazdrowicz J.;
+Informatyka;7;TI2;Seminarium dyplomowe;seminarium;B18;A3;Poniedzia³ek;08:15;10:00;Napieralski A.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+Informatyka;7;TI2;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;CTI;302;Poniedzia³ek;16:15;20:00;Nazdrowicz J.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;TI2;Administracja i bezpieczeñstwo systemów sieciowych;wyk³ad;B18;A1;Czwartek;12:15;14:00;Orlikowski M.;3,4,5,6,7,8,9,10
-Informatyka;7;TI3;Seminarium dyplomowe;seminarium;B18;A4;Poniedzia³ek;10:15;12:00;Napieralski A.;
-Informatyka;7;TI3;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;CTI;302;Œroda;17:15;20:00;Nazdrowicz J.;
+Informatyka;7;TI3;Seminarium dyplomowe;seminarium;B18;A4;Poniedzia³ek;10:15;12:00;Napieralski A.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+Informatyka;7;TI3;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;CTI;302;Œroda;17:15;20:00;Nazdrowicz J.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;TI3;Administracja i bezpieczeñstwo systemów sieciowych;wyk³ad;B18;A1;Czwartek;12:15;14:00;Orlikowski M.;3,4,5,6,7,8,9,10
-Informatyka;7;BDiSE;Seminarium dyplomowe;seminarium;A12;SW;Czwartek;10:15;12:00;Wiak S.;
+Informatyka;7;BDiSE;Seminarium dyplomowe;seminarium;A12;SW;Czwartek;10:15;12:00;Wiak S.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;BDiSE;Programowanie systemów ekspertowych;wyk³ad;A10;E106;Czwartek;16:15;19:00;Smó³ka K.;1,2,3,4,5
 Informatyka;7;BDiSE;Programowanie systemów ekspertowych;laboratorium;A12;132;Czwartek;16:15;19:00;Smó³ka K.;6,7,8,9,10
 Informatyka;7;GiM1;Techniki tworzenia plików filmowych;wyk³ad;A10;310;Poniedzia³ek;10:15;12:00;Romanowski A.;1,2,3,4,5,6,7,8
@@ -39,6 +39,6 @@ Informatyka;7;ZAB1;Obiektowe bazy danych;wyk³ad;A12;IBM;Poniedzia³ek;08:15;11:00
 Informatyka;7;ZAB1;Obiektowe bazy danych;wyk³ad;A10;E6;Pi¹tek;08:15;10:00;Dems M. ;1,2,3,4,5,6,7,8
 Informatyka;7;ZAB2;Obiektowe bazy danych;wyk³ad;A12;IBM;Poniedzia³ek;11:15;14:00;Drzyma³a P.;6,7,8,9,10
 Informatyka;7;ZAB2;Obiektowe bazy danych;wyk³ad;A10;E6;Pi¹tek;08:15;10:00;Dems M. ;1,2,3,4,5,6,7,8
-Informatyka;7;ZPS;Programowanie sieciowe 2;laboratorium;CTI;404;Œroda;13:15;15:00;Wajman R.;
+Informatyka;7;ZPS;Programowanie sieciowe 2;laboratorium;CTI;404;Œroda;13:15;15:00;Wajman R.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;ZSK;Zarz¹dzanie bezpieczeñstwem w sieciach;wyk³ad;A10;310;Œroda;10:15;13:00;Kapusta P.;1,2,3,4,5
 Informatyka;7;ZSK;Zarz¹dzanie bezpieczeñstwem w sieciach;laboratorium;A10;310;Œroda;10:15;13:00;Kapusta P.;6,7,8,9,10
