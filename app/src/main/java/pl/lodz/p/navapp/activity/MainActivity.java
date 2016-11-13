@@ -14,15 +14,22 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import pl.lodz.p.navapp.NavAppApplication;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.fragment.MapFragment;
 import pl.lodz.p.navapp.R;
@@ -32,6 +39,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
 
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
+    private static final String url = "https://jsonplaceholder.typicode.com/posts/1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +66,25 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        getTimetableInfo();
+
+    }
+
+    private void getTimetableInfo() {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Toast.makeText(getApplicationContext(),"Pomyślnie pobrano dane",Toast.LENGTH_SHORT).show();
+                Log.d("Success", response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),"Błąd podczas pobierania danych",Toast.LENGTH_SHORT).show();
+                Log.e("Error",error.getMessage());
+            }
+        });
+        NavAppApplication.getInstance().addToRequestQueue(stringRequest);
     }
 
     @Override
