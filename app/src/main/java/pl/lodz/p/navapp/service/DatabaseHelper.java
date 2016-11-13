@@ -34,4 +34,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS" + DATABASE_NAME);
         onCreate(db);
     }
+    public boolean insertData(String name,String shortname,String address, String longtitude, String latitude) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_2,name);
+        contentValues.put(COL_3,shortname);
+        contentValues.put(COL_4,address);
+        contentValues.put(COL_5,longtitude);
+        contentValues.put(COL_6,latitude);
+        long result = db.insert(TABLE_NAME,null ,contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
 }
