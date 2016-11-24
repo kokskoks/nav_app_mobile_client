@@ -10,28 +10,27 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String DATABASE_NAME = "navAppDB.db";
-    public static final String TABLE_NAME = "cordinates.db";
+    private static final String DATABASE_NAME = "navAppDB.db";
+    private static final String TABLE_NAME = "COORDINATES";
     public static final String COL_1 = "ID";
-    public static final String COL_2 = "NAME";
-    public static final String COL_3 = "SHORTNAME";
-    public static final String COL_4 = "ADDRESS";
-    public static final String COL_5 = "LONGITUDE";
-    public static final String COL_6 = "LATITUDE";
+    private static final String COL_2 = "NAME";
+    private static final String COL_3 = "SHORTNAME";
+    private static final String COL_4 = "ADDRESS";
+    private static final String COL_5 = "LONGITUDE";
+    private static final String COL_6 = "LATITUDE";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
-        SQLiteDatabase db = this.getWritableDatabase();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table" + DATABASE_NAME + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME, SHORT_NAME, ADDRESS, LONGITUDE, LATITUDE  )");
+        db.execSQL("create table " + TABLE_NAME + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME, SHORT_NAME, ADDRESS, LONGITUDE, LATITUDE  )");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS" + DATABASE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS" + TABLE_NAME);
         onCreate(db);
     }
     public boolean insertData(String name,String shortname,String address, String longtitude, String latitude) {
@@ -43,9 +42,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL_5,longtitude);
         contentValues.put(COL_6,latitude);
         long result = db.insert(TABLE_NAME,null ,contentValues);
-        if(result == -1)
-            return false;
-        else
-            return true;
+        return result != -1;
     }
 }
