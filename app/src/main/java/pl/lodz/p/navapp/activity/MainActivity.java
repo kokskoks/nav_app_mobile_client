@@ -7,9 +7,9 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -32,8 +32,8 @@ import java.util.Map;
 
 import pl.lodz.p.navapp.NavAppApplication;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
-import pl.lodz.p.navapp.fragment.MapFragment;
 import pl.lodz.p.navapp.R;
+import pl.lodz.p.navapp.fragment.MapFragment;
 import pl.lodz.p.navapp.fragment.TimetableFragment;
 import pl.lodz.p.navapp.service.DatabaseHelper;
 
@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity
 
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
     DatabaseHelper cordinatesDB;
-    Context context;
     private static final String url = "https://jsonplaceholder.typicode.com/posts/1";
 
     @Override

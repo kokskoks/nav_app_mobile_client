@@ -5,14 +5,21 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import pl.lodz.p.navapp.ClassInfo;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.R;
+import pl.lodz.p.navapp.RVAdapter;
 
 public class TimetableFragment extends Fragment {
 
@@ -34,6 +41,18 @@ public class TimetableFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
         AutoCompleteTextView autocompleteLocation = (AutoCompleteTextView) getActivity().findViewById(R.id.mySearchView);
         autocompleteLocation.setAdapter(null);
+        RecyclerView rv = (RecyclerView)view.findViewById(R.id.group_recycler_view);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),1);
+        rv.setLayoutManager(gridLayoutManager);
+        List<ClassInfo> classInfos = new ArrayList<>();
+        ClassInfo przyrka = new ClassInfo("Pszyrka","Akwarium","8:00","10:00");
+        ClassInfo religia = new ClassInfo("Religia","Akwarium","10:00","12:00");
+        ClassInfo wychowanie = new ClassInfo("Wychowanie do życia w rodzinie","Akwarium","12:00","14:00");
+        classInfos.add(przyrka);
+        classInfos.add(religia);
+        classInfos.add(wychowanie);
+        RVAdapter adapter = new RVAdapter(classInfos);
+        rv.setAdapter(adapter);
         return view;
     }
 

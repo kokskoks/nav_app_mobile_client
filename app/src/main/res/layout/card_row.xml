@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:padding="16dp"
+    >
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/cv"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            >
+
+            <TextView
+                android:text="Nazwa przedmiotu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_margin="10dp"
+                android:id="@+id/className"
+                android:textStyle="normal|bold"
+                android:textSize="24sp" />
+
+            <TextView
+                android:text="Budynek"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/className"
+                android:layout_alignLeft="@+id/className"
+                android:layout_alignStart="@+id/className"
+                android:layout_marginBottom="10dp"
+                android:id="@+id/buildingName"
+                android:textSize="18sp" />
+
+            <TextView
+                android:text="Od:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/buildingName"
+                android:layout_alignLeft="@+id/buildingName"
+                android:layout_alignStart="@+id/buildingName"
+                android:id="@+id/textView4" />
+
+            <TextView
+                android:text="Godzina"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/textView4"
+                android:layout_toRightOf="@+id/textView4"
+                android:layout_toEndOf="@+id/textView4"
+                android:id="@+id/from" />
+
+            <TextView
+                android:text="Do:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView6"
+                android:layout_below="@+id/textView4"
+                android:layout_alignLeft="@+id/textView4"
+                android:layout_alignStart="@+id/textView4" />
+
+            <TextView
+                android:text="Godzina"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/to"
+                android:layout_below="@+id/from"
+                android:layout_toRightOf="@+id/textView4"
+                android:layout_toEndOf="@+id/textView4" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

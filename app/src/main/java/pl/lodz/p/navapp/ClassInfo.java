@@ -41,8 +41,6 @@ public class ClassInfo {
     private String to;
     private Teacher teacher;
 
-    public ClassInfo() {
-    }
 
     public ClassInfo(String groupName, String name, Type type, String building, String classroom, Day day, String from, String to, Teacher teacher) {
         this.groupName = groupName;
@@ -54,6 +52,13 @@ public class ClassInfo {
         this.from = from;
         this.to = to;
         this.teacher = teacher;
+    }
+
+    public ClassInfo(String name, String building, String from, String to) {
+        this.name = name;
+        this.building = building;
+        this.from = from;
+        this.to = to;
     }
 
     public Teacher getTeacher() {
