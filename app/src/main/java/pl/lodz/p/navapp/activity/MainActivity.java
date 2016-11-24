@@ -15,11 +15,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -50,6 +54,9 @@ public class MainActivity extends AppCompatActivity
     DatabaseHelper cordinatesDB;
     private static final String url = "https://nav-app.herokuapp.com/api/buildings";
     List<PlaceInfo> placeInfos;
+    private AutoCompleteTextView autocompleteLocation;
+    Map<Integer, PlaceInfo> buildings;
+    List<String> names;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +67,8 @@ public class MainActivity extends AppCompatActivity
             checkPermissions();
         }
         placeInfos = new ArrayList<>();
+        buildings = new HashMap();
+        names = new ArrayList<>();
         if(savedInstanceState==null){
             MapFragment mapFragment = MapFragment.getInstance();
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -77,17 +86,21 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        autocompleteLocation = (AutoCompleteTextView) findViewById(R.id.mySearchView);
         getTimetableInfo();
 
     }
 
     private void getTimetableInfo() {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+
             @Override
             public void onResponse(String response) {
                 try {
                     translateResponse(response);
+                    createHashMap();
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplication(), R.layout.my_list_layout, names);
+                    autocompleteLocation.setAdapter(adapter);
                 } catch (JSONException e) {
                     Toast.makeText(getApplicationContext(), "Błąd podczas parsowania danych", Toast.LENGTH_SHORT).show();
                 }
@@ -96,10 +109,29 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(getApplicationContext(),"Błąd podczas pobierania danych",Toast.LENGTH_SHORT).show();
-                Log.e("Error",error.getMessage());
             }
-        });
+        }
+        ){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> params = new HashMap<>();
+                String creds = String.format("%s:%s","user","user");
+                String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
+                params.put("Authorization", auth);
+                return params;
+            }};
         NavAppApplication.getInstance().addToRequestQueue(stringRequest);
+    }
+
+    private void createHashMap() {
+        for (int i = 0; i < placeInfos.size(); i++) {
+            PlaceInfo placeInfo = placeInfos.get(i);
+            List<String> sublocationNames = placeInfo.getNames();
+            for (int j = 0; j < sublocationNames.size(); j++) {
+                names.add(sublocationNames.get(j));
+                buildings.put(j+i, placeInfo);
+            }
+        }
     }
 
     private void translateResponse(String response) throws JSONException {
@@ -108,6 +140,7 @@ public class MainActivity extends AppCompatActivity
             PlaceInfo placeInfo = new PlaceInfo();
             JSONObject object = (JSONObject) array.get(i);
             placeInfo.setPlaceNumber(object.getString("code"));
+
             placeInfo.setDescription(object.getString("description"));
             placeInfo.setAddress(object.getString("street"));
             if(!object.getString("longitude").equalsIgnoreCase("null")){
@@ -124,7 +157,6 @@ public class MainActivity extends AppCompatActivity
             }
             placeInfos.add(placeInfo);
         }
-        Toast.makeText(getApplicationContext(),"Pomyślnie sparsowano dane",Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -233,4 +265,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
     // END PERMISSION CHECK
+
+    public Map<Integer,PlaceInfo> getBuildings(){
+        return this.buildings;
+    }
+
+    public List<String> getNames(){
+        return this.names;
+    }
 }

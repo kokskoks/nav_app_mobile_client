@@ -43,12 +43,14 @@ import org.osmdroid.views.overlay.Polyline;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import pl.lodz.p.navapp.NavigationInfo;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.PlaceInfo;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.RouteFinder;
+import pl.lodz.p.navapp.activity.MainActivity;
 
 public class MapFragment extends Fragment implements LocationListener{
     private MapView mMapView;
@@ -64,6 +66,8 @@ public class MapFragment extends Fragment implements LocationListener{
     private List<Drawable> images;
     private AutoCompleteTextView autocompleteLocation;
     boolean fromCurrentLocation = true;
+    private Map<Integer,PlaceInfo> buildings;
+    private List<String> namesList;
 
     private static MapFragment instance = null;
 
@@ -78,11 +82,11 @@ public class MapFragment extends Fragment implements LocationListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        buildings = ((MainActivity) getActivity()).getBuildings();
+        namesList = ((MainActivity) getActivity()).getNames();
         setRetainInstance(true);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         placesList = new ArrayList<>();
-        createData();
     }
 
     public void addMarker(PlaceInfo place, boolean buildingInfoMarker) {
@@ -93,7 +97,7 @@ public class MapFragment extends Fragment implements LocationListener{
         marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
         marker.setTitle(place.getTitle());
         marker.setSubDescription(place.getDescription());
-        marker.setImage(images.get(place.getID()));
+        //marker.setImage(images.get(place.getID()));
         if (buildingInfoMarker) {
             mMapView.getOverlays().clear();
         }
@@ -141,12 +145,12 @@ public class MapFragment extends Fragment implements LocationListener{
             }
         });
         autocompleteLocation = (AutoCompleteTextView) getActivity().findViewById(R.id.mySearchView);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, names);
-        autocompleteLocation.setAdapter(adapter);
+       /* ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, names);
+        autocompleteLocation.setAdapter(adapter);*/
         autocompleteLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                addMarker(placesList.get(i), true);
+                addMarker(buildings.get(i), true);
                 if (view != null) {
                     InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -203,7 +207,7 @@ public class MapFragment extends Fragment implements LocationListener{
                 }
             }
         });
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, names);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.my_list_layout, namesList);
         dialogFromLocation.setAdapter(adapter);
         dialogToLocation.setAdapter(adapter);
         Button ok = (Button) dialog.findViewById(R.id.dialogOkButton);
@@ -212,29 +216,20 @@ public class MapFragment extends Fragment implements LocationListener{
             public void onClick(View view) {
                 String fromLocation = dialogFromLocation.getText().toString();
                 String toLocation = dialogToLocation.getText().toString();
-                if (fromLocation.isEmpty() || toLocation.isEmpty()) {
-                    Toast.makeText(getContext(), "Wprowadź dane", Toast.LENGTH_SHORT).show();
+                from = buildings.get(namesList.indexOf(fromLocation));
+                to = buildings.get(namesList.indexOf(toLocation));
+                if (currentLocation.isChecked()) {
+                    PlaceInfo currentPosition = findCurrentLocation();
+                    if (currentPosition != null) {
+                        fromCurrentLocation = true;
+                        from = currentPosition;
+                    }
                 } else {
-                    for (PlaceInfo place : placesList) {
-                        if (toLocation.equalsIgnoreCase(place.getTitle())) {
-                            to = place;
-                        }
-                        if (fromLocation.equalsIgnoreCase(place.getTitle())) {
-                            from = place;
-                        }
-                    }
-                    if (currentLocation.isChecked()) {
-                        PlaceInfo currentPosition = findCurrentLocation();
-                        if (currentPosition != null) {
-                            fromCurrentLocation = true;
-                            from = currentPosition;
-                        }
-                    } else {
-                        fromCurrentLocation = false;
-                    }
-                    drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId());
-                    dialog.dismiss();
+                    fromCurrentLocation = false;
                 }
+                drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId());
+                dialog.dismiss();
+
             }
         });
         dialog.show();
@@ -285,39 +280,6 @@ public class MapFragment extends Fragment implements LocationListener{
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    private void createData() {
-        images = new ArrayList<>();
-        Resources resources = getResources();
-        images.add(resources.getDrawable(R.drawable.weeia));
-        images.add(resources.getDrawable(R.drawable.mech));
-        images.add(resources.getDrawable(R.drawable.chem));
-        images.add(resources.getDrawable(R.drawable.mech));
-        images.add(resources.getDrawable(R.drawable.mech_fabryka_inz));
-        images.add(resources.getDrawable(R.drawable.chem));
-        images.add(resources.getDrawable(R.drawable.ife));
-        images.add(resources.getDrawable(R.drawable.binoz));
-        images.add(resources.getDrawable(R.drawable.weeia));
-        images.add(resources.getDrawable(R.drawable.weeia));
-        images.add(resources.getDrawable(R.drawable.ipos));
-        images.add(resources.getDrawable(R.drawable.binoz));
-        images.add(resources.getDrawable(R.drawable.rekrutacja));
-        images.add(resources.getDrawable(R.drawable.wzornictwa));
-
-        names = new String[]{"Wydział Elektrotechniki Elektroniki Informatyki i Automatyki", "Wydział Mechaniczny", "Wydział Chemiczny", "Wydział Mechaniczny",
-                "Wydział Mechaniczny - Fabryka Inżynierów", "Instytut Chemi Ogólnej i Ekologicznej", "Centrum Kształcenia Międzynarodowego"
-                , "Wydział Biotechnologii i nauk o żywności", "Katedra aparatury przemysłowej", "Instytut Mechatroniki i Systemów Informatycznych",
-                "Wydział Inżynierii Procesowej i Ochrony środowiska", "Wydział Biotechnologii i nauk o żywności", "Rekrutacja", "Wydział Technologii Materiałowych i Wzornictwa Tekstyliów"};
-        String[] addresses = new String[]{"Stefanowskiego 18/22", "Stefanowskiego 1/15", "Żeromskiego 116", "Stefanowskiego 1/15", "Stefanowskiego 2", "Żeromskiego 116", "Żwirki 36",
-                "Stefanowskiego", "Stefanowskiego 12/16", "Stefanowskiego 18/22", "Wólczańska 213", "Wólczańska 171/173", "Stefanowskiego 18/22", "Żeromskiego 116"};
-        double[] lat = new double[]{51.75252299, 51.75284959, 51.75365549, 51.75373305, 51.75495143, 51.75424923, 51.75503501, 51.75472001, 51.75370351, 51.7537103, 51.75412276, 51.75448702, 51.75259608, 51.75283733};
-        double[] lon = new double[]{19.45303313, 19.45258552, 19.45091179, 19.45180004, 19.45124336, 19.45077855, 19.45152691, 19.45264238, 19.4529498, 19.45394666, 19.45414356, 19.45450147, 19.45366977, 19.4502742};
-
-        for (int i = 0; i < names.length; i++) {
-            placesList.add(new PlaceInfo(i, names[i], addresses[i], lat[i], lon[i]));
-        }
-
     }
 
     public void drawRoute(Road road) {

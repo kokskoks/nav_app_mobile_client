@@ -104,9 +104,9 @@ public class PlaceInfo {
 
     public List<String> getNames() {
         if (this.names == null) {
-            return new ArrayList<>();
+            this.names = new ArrayList<>();
         }
-        return names;
+        return this.names;
     }
 
     public void setNames(List<String> names) {
