@@ -3,7 +3,6 @@ package pl.lodz.p.navapp.fragment;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -93,7 +92,7 @@ public class MapFragment extends Fragment implements LocationListener{
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
         marker.setTitle(place.getTitle());
-        marker.setSubDescription(place.getSubDescription());
+        marker.setSubDescription(place.getDescription());
         marker.setImage(images.get(place.getID()));
         if (buildingInfoMarker) {
             mMapView.getOverlays().clear();

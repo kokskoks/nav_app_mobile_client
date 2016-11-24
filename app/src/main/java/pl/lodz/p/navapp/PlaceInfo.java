@@ -9,37 +9,43 @@ import org.osmdroid.util.GeoPoint;
  */
 
 public class PlaceInfo {
-    private int ID;
+    private int id;
     private String title;
-    private String subDescription;
+    private String placeNumber;
+    private String address;
+    private String description;
     private int drawableID;
     private GeoPoint geoPoint;
 
-    public PlaceInfo(int ID, String title, String subDescription, double lat, double lon) {
-        this.ID = ID;
-        this.title = title;
-        this.subDescription = subDescription;
-        this.geoPoint = new GeoPoint(lat,lon);
-    }
 
-    public PlaceInfo(Location myLocation) {
+
+    public PlaceInfo(Location myLocation, int id, String title, String placeNumber, String address, String description, int drawableID) {
         this.geoPoint = new GeoPoint(myLocation.getLatitude(),myLocation.getLongitude());
-    }
-
-    public int getDrawableID() {
-        return drawableID;
-    }
-
-    public void setDrawableID(int drawableID) {
+        this.id = id;
+        this.title = title;
+        this.placeNumber = placeNumber;
+        this.address = address;
+        this.description = description;
         this.drawableID = drawableID;
     }
 
-    public String getSubDescription() {
-        return subDescription;
+    public PlaceInfo(Location location){
+        this.geoPoint= new GeoPoint(location);
     }
 
-    public void setSubDescription(String subDescription) {
-        this.subDescription = subDescription;
+    public PlaceInfo(int i, String name, String address, double v, double v1) {
+        this.id = i;
+        this.title=name;
+        this.address=address;
+        this.geoPoint= new GeoPoint(v,v1);
+    }
+
+    public int getID() {
+        return id;
+    }
+
+    public void setID(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -50,19 +56,43 @@ public class PlaceInfo {
         this.title = title;
     }
 
+    public String getPlaceNumber() {
+        return placeNumber;
+    }
+
+    public void setPlaceNumber(String placeNumber) {
+        this.placeNumber = placeNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getDrawableID() {
+        return drawableID;
+    }
+
+    public void setDrawableID(int drawableID) {
+        this.drawableID = drawableID;
+    }
+
     public GeoPoint getGeoPoint() {
         return geoPoint;
     }
 
     public void setGeoPoint(GeoPoint geoPoint) {
         this.geoPoint = geoPoint;
-    }
-
-    public int getID() {
-        return ID;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
     }
 }
