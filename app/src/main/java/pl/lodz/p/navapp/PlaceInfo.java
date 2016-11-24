@@ -32,6 +32,8 @@ public class PlaceInfo {
     public PlaceInfo(Location location){
         this.geoPoint= new GeoPoint(location);
     }
+    public PlaceInfo(){
+    }
 
     public PlaceInfo(int i, String name, String address, double v, double v1) {
         this.id = i;
