@@ -4,6 +4,9 @@ import android.location.Location;
 
 import org.osmdroid.util.GeoPoint;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Łukasz Świtoń on 24.10.2016.
  */
@@ -16,11 +19,11 @@ public class PlaceInfo {
     private String description;
     private int drawableID;
     private GeoPoint geoPoint;
-
+    private List<String> names;
 
 
     public PlaceInfo(Location myLocation, int id, String title, String placeNumber, String address, String description, int drawableID) {
-        this.geoPoint = new GeoPoint(myLocation.getLatitude(),myLocation.getLongitude());
+        this.geoPoint = new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude());
         this.id = id;
         this.title = title;
         this.placeNumber = placeNumber;
@@ -29,17 +32,18 @@ public class PlaceInfo {
         this.drawableID = drawableID;
     }
 
-    public PlaceInfo(Location location){
-        this.geoPoint= new GeoPoint(location);
+    public PlaceInfo(Location location) {
+        this.geoPoint = new GeoPoint(location);
     }
-    public PlaceInfo(){
+
+    public PlaceInfo() {
     }
 
     public PlaceInfo(int i, String name, String address, double v, double v1) {
         this.id = i;
-        this.title=name;
-        this.address=address;
-        this.geoPoint= new GeoPoint(v,v1);
+        this.title = name;
+        this.address = address;
+        this.geoPoint = new GeoPoint(v, v1);
     }
 
     public int getID() {
@@ -96,5 +100,16 @@ public class PlaceInfo {
 
     public void setGeoPoint(GeoPoint geoPoint) {
         this.geoPoint = geoPoint;
+    }
+
+    public List<String> getNames() {
+        if (this.names == null) {
+            return new ArrayList<>();
+        }
+        return names;
+    }
+
+    public void setNames(List<String> names) {
+        this.names = names;
     }
 }

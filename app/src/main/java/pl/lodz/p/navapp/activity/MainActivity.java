@@ -25,6 +25,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.osmdroid.util.GeoPoint;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +37,7 @@ import java.util.Map;
 
 import pl.lodz.p.navapp.NavAppApplication;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
+import pl.lodz.p.navapp.PlaceInfo;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.fragment.MapFragment;
 import pl.lodz.p.navapp.fragment.TimetableFragment;
@@ -42,7 +48,8 @@ public class MainActivity extends AppCompatActivity
 
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
     DatabaseHelper cordinatesDB;
-    private static final String url = "https://jsonplaceholder.typicode.com/posts/1";
+    private static final String url = "https://nav-app.herokuapp.com/api/buildings";
+    List<PlaceInfo> placeInfos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +59,7 @@ public class MainActivity extends AppCompatActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions();
         }
+        placeInfos = new ArrayList<>();
         if(savedInstanceState==null){
             MapFragment mapFragment = MapFragment.getInstance();
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -78,8 +86,11 @@ public class MainActivity extends AppCompatActivity
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Toast.makeText(getApplicationContext(),"Pomyślnie pobrano dane",Toast.LENGTH_SHORT).show();
-                Log.d("Success", response);
+                try {
+                    translateResponse(response);
+                } catch (JSONException e) {
+                    Toast.makeText(getApplicationContext(), "Błąd podczas parsowania danych", Toast.LENGTH_SHORT).show();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -89,6 +100,31 @@ public class MainActivity extends AppCompatActivity
             }
         });
         NavAppApplication.getInstance().addToRequestQueue(stringRequest);
+    }
+
+    private void translateResponse(String response) throws JSONException {
+        JSONArray array = new JSONArray(response);
+        for (int i = 0; i < array.length(); i++) {
+            PlaceInfo placeInfo = new PlaceInfo();
+            JSONObject object = (JSONObject) array.get(i);
+            placeInfo.setPlaceNumber(object.getString("code"));
+            placeInfo.setDescription(object.getString("description"));
+            placeInfo.setAddress(object.getString("street"));
+            if(!object.getString("longitude").equalsIgnoreCase("null")){
+                double lon = Double.valueOf(object.getString("longitude"));
+                double lat = Double.valueOf(object.getString("latitude"));
+                GeoPoint geoPoint = new GeoPoint(lat,lon);
+                placeInfo.setGeoPoint(geoPoint);
+            }
+            JSONArray subLocations = object.getJSONArray("sublocations");
+            for(int j=0;j<subLocations.length();j++){
+                JSONObject sublocation = (JSONObject) subLocations.get(j);
+                List<String> sublocations = placeInfo.getNames();
+                sublocations.add(sublocation.getString("name"));
+            }
+            placeInfos.add(placeInfo);
+        }
+        Toast.makeText(getApplicationContext(),"Pomyślnie sparsowano dane",Toast.LENGTH_SHORT).show();
     }
 
     @Override
