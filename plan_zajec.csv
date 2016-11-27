@@ -7,13 +7,13 @@ Informatyka;7;SS;5;Podstawy teorii sygna³ów;wyk³ad;A10;C3;Czwartek;10:15;13:00;O
 Informatyka;7;SS;6;Podstawy teorii sygna³ów;laboratorium;A10;C3;Czwartek;10:15;13:00;Ossowski M.;6,7,8,9,10
 Informatyka;7;SS;7;System zarz¹dzania bezpieczeñstwem informacji i elementy prawne ;wyk³ad;A10;310;Czwartek;13:15;14:00;Nowakowski J.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;TI1;8;Seminarium dyplomowe;seminarium;B18;A4;Poniedzia³ek;10:15;12:00;Napieralski A.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-Informatyka;7;TI1;9;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;CTI;302;Czwartek;09:15;12:00;Orlikowski M.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+Informatyka;7;TI1;9;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;B19;302;Czwartek;09:15;12:00;Orlikowski M.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;TI1;10;Administracja i bezpieczeñstwo systemów sieciowych;wyk³ad;B18;A1;Czwartek;12:15;14:00;Orlikowski M.;3,4,5,6,7,8,9,10
 Informatyka;7;TI2;11;Seminarium dyplomowe;seminarium;B18;A3;Poniedzia³ek;08:15;10:00;Napieralski A.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-Informatyka;7;TI2;12;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;CTI;302;Poniedzia³ek;16:15;20:00;Nazdrowicz J.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+Informatyka;7;TI2;12;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;B19;302;Poniedzia³ek;16:15;20:00;Nazdrowicz J.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;TI2;13;Administracja i bezpieczeñstwo systemów sieciowych;wyk³ad;B18;A1;Czwartek;12:15;14:00;Orlikowski M.;3,4,5,6,7,8,9,10
 Informatyka;7;TI3;14;Seminarium dyplomowe;seminarium;B18;A4;Poniedzia³ek;10:15;12:00;Napieralski A.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-Informatyka;7;TI3;15;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;CTI;302;Œroda;17:15;20:00;Nazdrowicz J.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+Informatyka;7;TI3;15;Administracja i bezpieczeñstwo systemów sieciowych;laboratorium;B19;302;Œroda;17:15;20:00;Nazdrowicz J.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;TI3;16;Administracja i bezpieczeñstwo systemów sieciowych;wyk³ad;B18;A1;Czwartek;12:15;14:00;Orlikowski M.;3,4,5,6,7,8,9,10
 Informatyka;7;BDiSE;17;Seminarium dyplomowe;seminarium;A12;SW;Czwartek;10:15;12:00;Wiak S.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;BDiSE;18;Programowanie systemów ekspertowych;wyk³ad;A10;E106;Czwartek;16:15;19:00;Smó³ka K.;1,2,3,4,5
@@ -27,18 +27,18 @@ Informatyka;7;PG;25;Programowanie gier i aplikacji na urz¹dzenia przenoœne;labor
 Informatyka;7;TiZJO;26;Programowanie pod k¹tem wielokrotnego u¿ycia;wyk³ad;A10;310;Wtorek;10:15;13:00;Majchrowicz M.;1,2,3,4,5
 Informatyka;7;TiZJO;27;Programowanie pod k¹tem wielokrotnego u¿ycia;laboratorium;A10;310;Wtorek;10:15;13:00;Majchrowicz M.;6,7,8,9,10
 Informatyka;7;TiZJO;28;Programowanie pod k¹tem wielokrotnego u¿ycia;laboratorium;A10;310;Œroda;16:15;19:00;Majchrowicz M.;6,7,8,9,10
-Informatyka;7;TM1;29;Przetwarzanie w chmurze dla mobilnych aplikacji;laboratorium;CTI;301;Wtorek;10:15;13:00;Sêkalski P.;1,2,3,4,5
-Informatyka;7;TM1;30;Systemy operacyjne na platformach mobilnych;laboratorium;CTI;301;Pi¹tek;08:00;11:00;Napieralski J.;1,3,5,7,9
-Informatyka;7;TM2;31;Przetwarzanie w chmurze dla mobilnych aplikacji;laboratorium;CTI;301;Wtorek;10:15;13:00;Sêkalski P.;6,7,8,9,10
-Informatyka;7;TM2;32;Systemy operacyjne na platformach mobilnych;laboratorium;CTI;301;Pi¹tek;08:00;11:00;Napieralski J.;2,4,6,8,10
-Informatyka;7;TM3;33;Przetwarzanie w chmurze dla mobilnych aplikacji;laboratorium;CTI;301;Pi¹tek;11:15;14:00;Sêkalski P.;1,2,3,4,5
-Informatyka;7;TM3;34;Systemy operacyjne na platformach mobilnych;laboratorium;CTI;301;Pi¹tek;14:15;17:00;Olchowik K.;2,4,6,8,10
-Informatyka;7;TM4;35;Przetwarzanie w chmurze dla mobilnych aplikacji;laboratorium;CTI;301;Pi¹tek;11:15;14:00;Sêkalski P.;6,7,8,9,10
-Informatyka;7;TM4;36;Systemy operacyjne na platformach mobilnych;laboratorium;CTI;301;Pi¹tek;14:15;17:00;Olchowik K.;1,3,5,7,9
+Informatyka;7;TM1;29;Przetwarzanie w chmurze dla mobilnych aplikacji;laboratorium;B19;301;Wtorek;10:15;13:00;Sêkalski P.;1,2,3,4,5
+Informatyka;7;TM1;30;Systemy operacyjne na platformach mobilnych;laboratorium;B19;301;Pi¹tek;08:00;11:00;Napieralski J.;1,3,5,7,9
+Informatyka;7;TM2;31;Przetwarzanie w chmurze dla mobilnych aplikacji;laboratorium;B19;301;Wtorek;10:15;13:00;Sêkalski P.;6,7,8,9,10
+Informatyka;7;TM2;32;Systemy operacyjne na platformach mobilnych;laboratorium;B19;301;Pi¹tek;08:00;11:00;Napieralski J.;2,4,6,8,10
+Informatyka;7;TM3;33;Przetwarzanie w chmurze dla mobilnych aplikacji;laboratorium;B19;301;Pi¹tek;11:15;14:00;Sêkalski P.;1,2,3,4,5
+Informatyka;7;TM3;34;Systemy operacyjne na platformach mobilnych;laboratorium;B19;301;Pi¹tek;14:15;17:00;Olchowik K.;2,4,6,8,10
+Informatyka;7;TM4;35;Przetwarzanie w chmurze dla mobilnych aplikacji;laboratorium;B19;301;Pi¹tek;11:15;14:00;Sêkalski P.;6,7,8,9,10
+Informatyka;7;TM4;36;Systemy operacyjne na platformach mobilnych;laboratorium;B19;301;Pi¹tek;14:15;17:00;Olchowik K.;1,3,5,7,9
 Informatyka;7;ZAB1;37;Obiektowe bazy danych;wyk³ad;A12;IBM;Poniedzia³ek;08:15;11:00;Drzyma³a P.;6,7,8,9,10
 Informatyka;7;ZAB1;38;Obiektowe bazy danych;wyk³ad;A10;E6;Pi¹tek;08:15;10:00;Dems M. ;1,2,3,4,5,6,7,8
 Informatyka;7;ZAB2;39;Obiektowe bazy danych;wyk³ad;A12;IBM;Poniedzia³ek;11:15;14:00;Drzyma³a P.;6,7,8,9,10
 Informatyka;7;ZAB2;40;Obiektowe bazy danych;wyk³ad;A10;E6;Pi¹tek;08:15;10:00;Dems M. ;1,2,3,4,5,6,7,8
-Informatyka;7;ZPS;41;Programowanie sieciowe 2;laboratorium;CTI;404;Œroda;13:15;15:00;Wajman R.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+Informatyka;7;ZPS;41;Programowanie sieciowe 2;laboratorium;B19;404;Œroda;13:15;15:00;Wajman R.;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 Informatyka;7;ZSK;42;Zarz¹dzanie bezpieczeñstwem w sieciach;wyk³ad;A10;310;Œroda;10:15;13:00;Kapusta P.;1,2,3,4,5
 Informatyka;7;ZSK;43;Zarz¹dzanie bezpieczeñstwem w sieciach;laboratorium;A10;310;Œroda;10:15;13:00;Kapusta P.;6,7,8,9,10
