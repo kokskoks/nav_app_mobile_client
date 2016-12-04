@@ -12,31 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pl.lodz.p.navapp.PlaceInfo;
+import pl.lodz.p.navapp.Sublocation;
+
+import static pl.lodz.p.navapp.service.DatabaseConstants.*;
 
 /**
  * Created by Calgon on 2016-11-13.
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "navAppDB.db";
-    private static final String TABLE_COORDINATES = "COORDINATES";
-    private static final String COLUMN_ID = "ID";
-    private static final String COLUMN_TITLE = "TITLE";
-    private static final String COLUMN_PLACE_NUMBER = "PLACE_NUMBER";
-    private static final String COLUMN_ADDRESS = "ADDRESS";
-    private static final String COLUMN_LONGITUDE = "LONGITUDE";
-    private static final String COLUMN_LATITUDE = "LATITUDE";
-    private static final String COLUMN_DESCRIPTION = "DESCRIPTION";
-
-    private static final String TABLE_CREATE_QUERY = "create table "
-            + TABLE_COORDINATES + "("
-            + COLUMN_ID + " INTEGER PRIMARY KEY, "
-            + COLUMN_TITLE + " TEXT, "
-            + COLUMN_PLACE_NUMBER + " TEXT, "
-            + COLUMN_ADDRESS + " TEXT, "
-            + COLUMN_LONGITUDE + " TEXT,"
-            + COLUMN_LATITUDE + " TEXT, "
-            + COLUMN_DESCRIPTION + " TEXT)";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -44,30 +28,81 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TABLE_CREATE_QUERY);
+        db.execSQL(COORDINATES_TABLE_CREATE_QUERY);
+        db.execSQL(SUBLOCATIONS_TABLE_CREATE_QUERY);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS" + TABLE_COORDINATES);
+        db.execSQL(DROP_COORDINATES_TABLE);
+        db.execSQL(DROP_SUBLOCATIONS_TABLE);
         onCreate(db);
     }
 
-    public boolean insertData(PlaceInfo placeInfo) {
+    /**
+     * Method that inserts Building info into database
+     *
+     * @param placeInfo Building info to be stored in database
+     * @return true if building was inserted, false otherwise
+     */
+    public boolean insertPlace(PlaceInfo placeInfo) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_ID, placeInfo.getID());
-        contentValues.put(COLUMN_TITLE, placeInfo.getTitle());
-        contentValues.put(COLUMN_PLACE_NUMBER, placeInfo.getPlaceNumber());
-        contentValues.put(COLUMN_ADDRESS, placeInfo.getAddress());
+        contentValues.put(COORDINATES_COLUMN_ID, placeInfo.getID());
+        contentValues.put(COORDINATES_COLUMN_TITLE, placeInfo.getTitle());
+        contentValues.put(COORDINATES_COLUMN_PLACE_NUMBER, placeInfo.getPlaceNumber());
+        contentValues.put(COORDINATES_COLUMN_ADDRESS, placeInfo.getAddress());
         GeoPoint geoPoint = placeInfo.getGeoPoint();
-        contentValues.put(COLUMN_LONGITUDE, geoPoint.getLongitude());
-        contentValues.put(COLUMN_LATITUDE, geoPoint.getLatitude());
-        contentValues.put(COLUMN_DESCRIPTION, placeInfo.getDescription());
+        contentValues.put(COORDINATES_COLUMN_LONGITUDE, geoPoint.getLongitude());
+        contentValues.put(COORDINATES_COLUMN_LATITUDE, geoPoint.getLatitude());
+        contentValues.put(COORDINATES_COLUMN_DESCRIPTION, placeInfo.getDescription());
         long result = db.insert(TABLE_COORDINATES, null, contentValues);
+        if (result != -1 && placeInfo.getSublocations() != null && !placeInfo.getSublocations().isEmpty()) {
+            result = insertSublocations(placeInfo);
+        }
         return result != -1;
     }
 
+    /**
+     * Method that inserts sublocations associated with building into database
+     *
+     * @param placeInfo Building info containing sublocations
+     * @return 0 if sublocations was inserted, -1 if not
+     */
+    private long insertSublocations(PlaceInfo placeInfo) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        for (Sublocation sublocation : placeInfo.getSublocations()) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(SUBLOCATIONS_COLUMN_ID, sublocation.getId());
+            contentValues.put(SUBLOCATIONS_COLUMN_CODE, sublocation.getCode());
+            contentValues.put(SUBLOCATIONS_COLUMN_NAME, sublocation.getName());
+            contentValues.put(SUBLOCATIONS_COORDINATES_ID, placeInfo.getID());
+            long result = db.insert(TABLE_SUBLOCATIONS, null, contentValues);
+            if (result == -1) {
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Method used for checking if Coordinates Table is empty.
+     *
+     * @return true if Coordinates Table is empty, false otherwise
+     */
+    public boolean isPlacesEmpty() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("SELECT count(*) FROM " + TABLE_COORDINATES, null);
+        boolean empty = res.getCount() <= 0;
+        res.close();
+        return empty;
+    }
+
+    /**
+     * Method that withdraws all buildings info from database
+     *
+     * @return List with all buildings
+     */
     public List<PlaceInfo> getPlaces() {
         SQLiteDatabase db = this.getWritableDatabase();
         List<PlaceInfo> places = new ArrayList<>();
@@ -75,7 +110,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (res.getCount() == 0) {
             return places;
         }
-
         while (res.moveToNext()) {
             PlaceInfo placeInfo = new PlaceInfo();
             placeInfo.setID(res.getInt(0));
@@ -87,6 +121,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             placeInfo.setGeoPoint(new GeoPoint(lat, lon));
             placeInfo.setDescription(res.getString(6));
             places.add(placeInfo);
+        }
+        for (PlaceInfo place : places) {
+            List<Sublocation> sublocations = new ArrayList<>();
+            Cursor res2 = db.rawQuery("SELECT * FROM " + TABLE_SUBLOCATIONS + " WHERE " + SUBLOCATIONS_COORDINATES_ID + "=" + place.getID(), null);
+            while (res2.moveToNext()) {
+                Sublocation sublocation = new Sublocation();
+                sublocation.setId(res2.getInt(0));
+                sublocation.setCode(res2.getString(1));
+                sublocation.setName(res2.getString(2));
+                sublocations.add(sublocation);
+            }
+            place.setSublocations(sublocations);
+            res2.close();
         }
         res.close();
         return places;

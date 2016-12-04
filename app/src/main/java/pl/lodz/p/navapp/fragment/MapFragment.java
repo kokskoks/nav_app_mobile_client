@@ -97,7 +97,7 @@ public class MapFragment extends Fragment implements LocationListener{
         marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
         marker.setTitle(place.getTitle());
         marker.setSubDescription(place.getDescription());
-        //marker.setImage(images.get(place.getID()));
+        //marker.setImage(images.get(place.getId()));
         if (buildingInfoMarker) {
             mMapView.getOverlays().clear();
         }
@@ -227,7 +227,9 @@ public class MapFragment extends Fragment implements LocationListener{
                 } else {
                     fromCurrentLocation = false;
                 }
-                drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId());
+                if(from !=null&& to !=null){
+                    drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId());
+                }
                 dialog.dismiss();
 
             }

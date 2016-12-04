@@ -19,7 +19,7 @@ public class PlaceInfo {
     private String description;
     private int drawableID;
     private GeoPoint geoPoint;
-    private List<String> names;
+    private List<Sublocation> sublocations;
 
 
     public PlaceInfo(Location myLocation, int id, String title, String placeNumber, String address, String description, int drawableID) {
@@ -102,14 +102,14 @@ public class PlaceInfo {
         this.geoPoint = geoPoint;
     }
 
-    public List<String> getNames() {
-        if (this.names == null) {
-            this.names = new ArrayList<>();
+    public List<Sublocation> getSublocations() {
+        if (this.sublocations == null) {
+            this.sublocations = new ArrayList<>();
         }
-        return this.names;
+        return this.sublocations;
     }
 
-    public void setNames(List<String> names) {
-        this.names = names;
+    public void setSublocations(List<Sublocation> sublocations) {
+        this.sublocations = sublocations;
     }
 }
