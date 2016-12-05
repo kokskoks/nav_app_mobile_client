@@ -15,7 +15,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -40,22 +39,20 @@ import java.util.Map;
 
 import pl.lodz.p.navapp.NavAppApplication;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
-import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.R;
+import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
 import pl.lodz.p.navapp.fragment.MapFragment;
 import pl.lodz.p.navapp.fragment.TimetableFragment;
 import pl.lodz.p.navapp.service.DatabaseHelper;
 
-import static pl.lodz.p.navapp.service.DatabaseConstants.DATABASE_NAME;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
 
-    final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
+    private static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
 
     private DatabaseHelper cordinatesDB;
-    private static final String url = "https://nav-app.herokuapp.com/api/buildings";
+    private static final String URL = "https://nav-app.herokuapp.com/api/buildings";
     private List<PlaceInfo> placeInfos;
     private AutoCompleteTextView autocompleteLocation;
     private List<String> names;
@@ -70,7 +67,7 @@ public class MainActivity extends AppCompatActivity
         }
         placeInfos = new ArrayList<>();
         names = new ArrayList<>();
-        if(savedInstanceState==null){
+        if (savedInstanceState == null) {
             MapFragment mapFragment = MapFragment.getInstance();
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, mapFragment);
@@ -88,11 +85,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         autocompleteLocation = (AutoCompleteTextView) findViewById(R.id.mySearchView);
-        if(cordinatesDB.isPlacesEmpty()){
+        if (cordinatesDB.isPlacesEmpty()) {
             getTimetableInfo();
-        }else{
-           populateFromDatabase();
-       }
+        } else {
+            populateFromDatabase();
+        }
     }
 
     private void populateFromDatabase() {
@@ -102,16 +99,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getTimetableInfo() {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
                 try {
                     translateResponse(response);
                     insertToDatabase();
-                    names= cordinatesDB.getPlacesNames();
+                    names = cordinatesDB.getPlacesNames();
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplication(), R.layout.my_list_layout, names);
                     autocompleteLocation.setAdapter(adapter);
+                    Toast.makeText(getApplicationContext(), "Pomyślnie sparsowano", Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     Toast.makeText(getApplicationContext(), "Błąd podczas parsowania danych", Toast.LENGTH_SHORT).show();
                 }
@@ -119,23 +117,24 @@ public class MainActivity extends AppCompatActivity
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),"Błąd podczas pobierania danych",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Błąd podczas pobierania danych", Toast.LENGTH_SHORT).show();
             }
         }
-        ){
+        ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> params = new HashMap<>();
-                String creds = String.format("%s:%s","user","user");
+                String creds = String.format("%s:%s", "user", "user");
                 String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
                 params.put("Authorization", auth);
                 return params;
-            }};
+            }
+        };
         NavAppApplication.getInstance().addToRequestQueue(stringRequest);
     }
 
     private void insertToDatabase() {
-        for(int i=0;i<placeInfos.size();i++){
+        for (int i = 0; i < placeInfos.size(); i++) {
             cordinatesDB.insertPlace(placeInfos.get(i));
         }
     }
@@ -151,15 +150,15 @@ public class MainActivity extends AppCompatActivity
             placeInfo.setPlaceNumber(object.getString("code").trim());
             placeInfo.setDescription(object.getString("description").trim());
             placeInfo.setAddress(object.getString("street").trim());
-            if(!"null".equalsIgnoreCase(object.getString("longitude"))){
+            if (!"null".equalsIgnoreCase(object.getString("longitude"))) {
                 double lon = Double.valueOf(object.getString("longitude"));
                 double lat = Double.valueOf(object.getString("latitude"));
-                GeoPoint geoPoint = new GeoPoint(lat,lon);
+                GeoPoint geoPoint = new GeoPoint(lat, lon);
                 placeInfo.setGeoPoint(geoPoint);
             }
             JSONArray subLocations = object.getJSONArray("sublocations");
             List<Sublocation> sublocationList = placeInfo.getSublocations();
-            for(int j=0;j<subLocations.length();j++){
+            for (int j = 0; j < subLocations.length(); j++) {
                 JSONObject responseSublocation = (JSONObject) subLocations.get(j);
                 Sublocation sublocation = new Sublocation();
                 sublocation.setId(Integer.parseInt(responseSublocation.getString("id")));
@@ -247,39 +246,34 @@ public class MainActivity extends AppCompatActivity
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS: {
-                Map<String, Integer> perms = new HashMap<>();
-                // Initial
-                perms.put(Manifest.permission.ACCESS_FINE_LOCATION, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION and WRITE_EXTERNAL_STORAGE
-                Boolean location = perms.get(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-                Boolean storage = perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-                if (location && storage) {
-                    // All Permissions Granted
-                    Toast.makeText(MainActivity.this, "All permissions granted", Toast.LENGTH_SHORT).show();
-                } else if (location) {
-                    Toast.makeText(this, "Storage permission is required to store map tiles to reduce data usage and for offline usage.", Toast.LENGTH_LONG).show();
-                } else if (storage) {
-                    Toast.makeText(this, "Location permission is required to show the user's location on map.", Toast.LENGTH_LONG).show();
-                } else { // !location && !storage case
-                    // Permission Denied
-                    Toast.makeText(MainActivity.this, "Storage permission is required to store map tiles to reduce data usage and for offline usage." +
-                            "\nLocation permission is required to show the user's location on map.", Toast.LENGTH_SHORT).show();
-                }
+        if (requestCode == REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS) {
+            Map<String, Integer> perms = new HashMap<>();
+            perms.put(Manifest.permission.ACCESS_FINE_LOCATION, PackageManager.PERMISSION_GRANTED);
+            perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
+            for (int i = 0; i < permissions.length; i++)
+                perms.put(permissions[i], grantResults[i]);
+            Boolean location = perms.get(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            Boolean storage = perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+            if (location && storage) {
+                // All Permissions Granted
+                Toast.makeText(MainActivity.this, "All permissions granted", Toast.LENGTH_SHORT).show();
+            } else if (location) {
+                Toast.makeText(this, "Storage permission is required to store map tiles to reduce data usage and for offline usage.", Toast.LENGTH_LONG).show();
+            } else if (storage) {
+                Toast.makeText(this, "Location permission is required to show the user's location on map.", Toast.LENGTH_LONG).show();
+            } else { // !location && !storage case
+                // Permission Denied
+                Toast.makeText(MainActivity.this, "Storage permission is required to store map tiles to reduce data usage and for offline usage." +
+                        "\nLocation permission is required to show the user's location on map.", Toast.LENGTH_SHORT).show();
             }
-            break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
     // END PERMISSION CHECK
 
-    public List<String> getNames(){
+    public List<String> getNames() {
         return this.names;
     }
 

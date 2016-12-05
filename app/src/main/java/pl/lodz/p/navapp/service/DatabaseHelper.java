@@ -93,7 +93,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public boolean isPlacesEmpty() {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("SELECT count(*) FROM " + TABLE_COORDINATES, null);
+        Cursor res = db.rawQuery("SELECT count(*) FROM " + TABLE_SUBLOCATIONS, null);
         boolean empty = res.getCount() <= 0;
         res.close();
         return empty;

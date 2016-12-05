@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -31,7 +30,6 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -46,31 +44,27 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-import pl.lodz.p.navapp.domain.NavigationInfo;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
-import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.RouteFinder;
 import pl.lodz.p.navapp.activity.MainActivity;
+import pl.lodz.p.navapp.domain.NavigationInfo;
+import pl.lodz.p.navapp.domain.PlaceInfo;
+import pl.lodz.p.navapp.service.DatabaseHelper;
 
-public class MapFragment extends Fragment implements LocationListener{
+public class MapFragment extends Fragment implements LocationListener {
     private MapView mMapView;
     private MapController mMapController;
     public static final int MAX_ZOOM_LEVEL = 20;
     public static final int ZOOMLEVEL = 17;
     private LocationManager locationManager;
     private OnFragmentInteractionListener mListener;
-    private List<PlaceInfo> placesList;
     private PlaceInfo from;
     private PlaceInfo to;
-    private String[] names;
-    private List<Drawable> images;
-    private AutoCompleteTextView autocompleteLocation;
     boolean fromCurrentLocation = true;
     private List<String> namesList;
-    private MainActivity mainActivity;
+    private DatabaseHelper db;
 
     private static MapFragment instance = null;
 
@@ -85,11 +79,11 @@ public class MapFragment extends Fragment implements LocationListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainActivity = (MainActivity) getActivity();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        db = mainActivity.getCordinatesDB();
         namesList = ((MainActivity) getActivity()).getNames();
         setRetainInstance(true);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        placesList = new ArrayList<>();
     }
 
     public void addMarker(PlaceInfo place, boolean buildingInfoMarker) {
@@ -107,7 +101,7 @@ public class MapFragment extends Fragment implements LocationListener{
         }
         mMapView.getOverlays().add(marker);
         mMapView.invalidate();
-        if(buildingInfoMarker){
+        if (buildingInfoMarker) {
             mMapController.animateTo(point);
         }
     }
@@ -144,22 +138,19 @@ public class MapFragment extends Fragment implements LocationListener{
             public void onClick(View view) {
                 PlaceInfo currentLocation = findCurrentLocation();
                 if (currentLocation != null) {
-                    addCurrentLocationMarker(currentLocation,false);
+                    addCurrentLocationMarker(currentLocation, false);
                 }
             }
         });
-        autocompleteLocation = (AutoCompleteTextView) getActivity().findViewById(R.id.mySearchView);
-       /* ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, names);
-        autocompleteLocation.setAdapter(adapter);*/
+        AutoCompleteTextView autocompleteLocation = (AutoCompleteTextView) getActivity().findViewById(R.id.mySearchView);
         autocompleteLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
                 String title = (String) adapterView.getItemAtPosition(i);
-                PlaceInfo placeInfo = mainActivity.getCordinatesDB().getPlace(title.trim());
+                PlaceInfo placeInfo = db.getPlace(title.trim());
                 addMarker(placeInfo, true);
                 if (view != null) {
-                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
             }
@@ -223,8 +214,8 @@ public class MapFragment extends Fragment implements LocationListener{
             public void onClick(View view) {
                 String fromLocation = dialogFromLocation.getText().toString();
                 String toLocation = dialogToLocation.getText().toString();
-/*                from = buildings.get(namesList.indexOf(fromLocation));
-                to = buildings.get(namesList.indexOf(toLocation));*/
+                from = db.getPlace(fromLocation.trim());
+                to = db.getPlace(toLocation.trim());
                 if (currentLocation.isChecked()) {
                     PlaceInfo currentPosition = findCurrentLocation();
                     if (currentPosition != null) {
@@ -234,7 +225,7 @@ public class MapFragment extends Fragment implements LocationListener{
                 } else {
                     fromCurrentLocation = false;
                 }
-                if(from !=null&& to !=null){
+                if (from != null && to != null) {
                     drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId());
                 }
                 dialog.dismiss();
@@ -248,7 +239,7 @@ public class MapFragment extends Fragment implements LocationListener{
         try {
             Geocoder geo = new Geocoder(getContext(), Locale.getDefault());
             GeoPoint currentLocationGeoPoint = place.getGeoPoint();
-            List<Address> addresses = geo.getFromLocation(currentLocationGeoPoint.getLatitude(),currentLocationGeoPoint.getLongitude(), 1);
+            List<Address> addresses = geo.getFromLocation(currentLocationGeoPoint.getLatitude(), currentLocationGeoPoint.getLongitude(), 1);
             if (!addresses.isEmpty()) {
                 Marker marker = new Marker(mMapView);
                 marker.setPosition(currentLocationGeoPoint);
@@ -256,7 +247,7 @@ public class MapFragment extends Fragment implements LocationListener{
                 marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
                 marker.setTitle(getString(R.string.currentLocation));
                 marker.setSubDescription(addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName());
-                if(!forNavigation){
+                if (!forNavigation) {
                     mMapView.getOverlays().clear();
                 }
                 mMapView.getOverlays().add(marker);
@@ -264,7 +255,7 @@ public class MapFragment extends Fragment implements LocationListener{
                 mMapController.animateTo(currentLocationGeoPoint);
             }
         } catch (Exception e) {
-            Log.e("Error",e.getMessage());
+            Log.e("Error", e.getMessage());
         }
     }
 
@@ -272,9 +263,12 @@ public class MapFragment extends Fragment implements LocationListener{
         public MyInfoWindow(int layoutResId, MapView mapView) {
             super(layoutResId, mapView);
         }
+
+        @Override
         public void onClose() {
         }
 
+        @Override
         public void onOpen(Object arg0) {
             LinearLayout layout = (LinearLayout) mView.findViewById(R.id.bubble_layout);
             Button btnMoreInfo = (Button) mView.findViewById(R.id.goToInternet);
@@ -293,9 +287,9 @@ public class MapFragment extends Fragment implements LocationListener{
         }
     }
 
-    public void openWebURL( String inURL ) {
-        Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse( inURL ) );
-        startActivity( browse );
+    public void openWebURL(String inURL) {
+        Intent browse = new Intent(Intent.ACTION_VIEW, Uri.parse(inURL));
+        startActivity(browse);
     }
 
     public void onButtonPressed(Uri uri) {
@@ -327,8 +321,8 @@ public class MapFragment extends Fragment implements LocationListener{
         mMapView.getOverlays().clear();
         mMapView.getOverlays().add(roadOverlay);
         if (fromCurrentLocation) {
-            addCurrentLocationMarker(from,true);
-        }else {
+            addCurrentLocationMarker(from, true);
+        } else {
             addMarker(from, false);
         }
         addMarker(to, false);
@@ -337,7 +331,7 @@ public class MapFragment extends Fragment implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        if(fromCurrentLocation) {
+        if (fromCurrentLocation) {
             GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
             drawPath(newLocation, to.getGeoPoint(), R.id.pedestrianRadioButton);
         }
