@@ -3,6 +3,7 @@ package pl.lodz.p.navapp.fragment;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -27,7 +28,10 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -37,6 +41,7 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,9 +98,10 @@ public class MapFragment extends Fragment implements LocationListener{
         marker.setPosition(point);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
+        InfoWindow infoWindow = new MyInfoWindow(R.layout.bubble, mMapView);
         marker.setTitle(place.getTitle());
         marker.setSubDescription(place.getDescription());
-        //marker.setImage(images.get(place.getId()));
+        marker.setInfoWindow(infoWindow);
         if (buildingInfoMarker) {
             mMapView.getOverlays().clear();
         }
@@ -260,6 +266,36 @@ public class MapFragment extends Fragment implements LocationListener{
         } catch (Exception e) {
             Log.e("Error",e.getMessage());
         }
+    }
+
+    private class MyInfoWindow extends InfoWindow {
+        public MyInfoWindow(int layoutResId, MapView mapView) {
+            super(layoutResId, mapView);
+        }
+        public void onClose() {
+        }
+
+        public void onOpen(Object arg0) {
+            LinearLayout layout = (LinearLayout) mView.findViewById(R.id.bubble_layout);
+            Button btnMoreInfo = (Button) mView.findViewById(R.id.goToInternet);
+            TextView txtTitle = (TextView) mView.findViewById(R.id.bubble_title);
+            TextView txtDescription = (TextView) mView.findViewById(R.id.bubble_description);
+            TextView txtSubdescription = (TextView) mView.findViewById(R.id.bubble_subdescription);
+
+            txtTitle.setText("Title of my marker");
+            txtDescription.setText("Click here to view details!");
+            txtSubdescription.setText("You can also edit the subdescription");
+            btnMoreInfo.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    openWebURL("http://www.onet.pl");
+                }
+            });
+        }
+    }
+
+    public void openWebURL( String inURL ) {
+        Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse( inURL ) );
+        startActivity( browse );
     }
 
     public void onButtonPressed(Uri uri) {
