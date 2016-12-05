@@ -5,7 +5,7 @@ package pl.lodz.p.navapp.service;
  */
 
 public class DatabaseConstants {
-    static final String DATABASE_NAME = "navAppDB.db";
+    public static final String DATABASE_NAME = "navAppDB.db";
     //Coordinates table
     static final String TABLE_COORDINATES = "COORDINATES";
     static final String COORDINATES_COLUMN_ID = "COORD_ID";
@@ -38,6 +38,7 @@ public class DatabaseConstants {
             + SUBLOCATIONS_COLUMN_ID + " INTEGER PRIMARY KEY, "
             + SUBLOCATIONS_COLUMN_CODE + " TEXT, "
             + SUBLOCATIONS_COLUMN_NAME + " TEXT, "
+            + COORDINATES_COLUMN_ID + " INTEGER, "
             + SUBLOCATIONS_COORDINATES_ID + " INTEGER, FOREIGN KEY ("
             + SUBLOCATIONS_COORDINATES_ID + ") REFERENCES " + TABLE_COORDINATES + "(" + COORDINATES_COLUMN_ID + "))";
 

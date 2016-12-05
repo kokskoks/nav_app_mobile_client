@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import pl.lodz.p.navapp.domain.ClassInfo;
+
 /**
  * Created by Łukasz Świtoń on 24.11.2016.
  */

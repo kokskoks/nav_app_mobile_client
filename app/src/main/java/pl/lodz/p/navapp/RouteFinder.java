@@ -3,13 +3,13 @@ package pl.lodz.p.navapp;
 import android.os.AsyncTask;
 
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 
+import pl.lodz.p.navapp.domain.NavigationInfo;
 import pl.lodz.p.navapp.fragment.MapFragment;
 
 /**

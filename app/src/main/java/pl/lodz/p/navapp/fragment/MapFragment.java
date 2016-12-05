@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -29,7 +28,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -45,9 +43,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import pl.lodz.p.navapp.NavigationInfo;
+import pl.lodz.p.navapp.domain.NavigationInfo;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
-import pl.lodz.p.navapp.PlaceInfo;
+import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.RouteFinder;
 import pl.lodz.p.navapp.activity.MainActivity;
@@ -66,8 +64,8 @@ public class MapFragment extends Fragment implements LocationListener{
     private List<Drawable> images;
     private AutoCompleteTextView autocompleteLocation;
     boolean fromCurrentLocation = true;
-    private Map<Integer,PlaceInfo> buildings;
     private List<String> namesList;
+    private MainActivity mainActivity;
 
     private static MapFragment instance = null;
 
@@ -82,7 +80,7 @@ public class MapFragment extends Fragment implements LocationListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        buildings = ((MainActivity) getActivity()).getBuildings();
+        mainActivity = (MainActivity) getActivity();
         namesList = ((MainActivity) getActivity()).getNames();
         setRetainInstance(true);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -150,7 +148,10 @@ public class MapFragment extends Fragment implements LocationListener{
         autocompleteLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                addMarker(buildings.get(i), true);
+
+                String title = (String) adapterView.getItemAtPosition(i);
+                PlaceInfo placeInfo = mainActivity.getCordinatesDB().getPlace(title.trim());
+                addMarker(placeInfo, true);
                 if (view != null) {
                     InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -216,8 +217,8 @@ public class MapFragment extends Fragment implements LocationListener{
             public void onClick(View view) {
                 String fromLocation = dialogFromLocation.getText().toString();
                 String toLocation = dialogToLocation.getText().toString();
-                from = buildings.get(namesList.indexOf(fromLocation));
-                to = buildings.get(namesList.indexOf(toLocation));
+/*                from = buildings.get(namesList.indexOf(fromLocation));
+                to = buildings.get(namesList.indexOf(toLocation));*/
                 if (currentLocation.isChecked()) {
                     PlaceInfo currentPosition = findCurrentLocation();
                     if (currentPosition != null) {

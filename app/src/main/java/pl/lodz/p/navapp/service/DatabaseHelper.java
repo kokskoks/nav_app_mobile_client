@@ -11,8 +11,8 @@ import org.osmdroid.util.GeoPoint;
 import java.util.ArrayList;
 import java.util.List;
 
-import pl.lodz.p.navapp.PlaceInfo;
-import pl.lodz.p.navapp.Sublocation;
+import pl.lodz.p.navapp.domain.PlaceInfo;
+import pl.lodz.p.navapp.domain.Sublocation;
 
 import static pl.lodz.p.navapp.service.DatabaseConstants.*;
 
@@ -76,7 +76,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             contentValues.put(SUBLOCATIONS_COLUMN_ID, sublocation.getId());
             contentValues.put(SUBLOCATIONS_COLUMN_CODE, sublocation.getCode());
             contentValues.put(SUBLOCATIONS_COLUMN_NAME, sublocation.getName());
-            contentValues.put(SUBLOCATIONS_COORDINATES_ID, placeInfo.getID());
+            contentValues.put(COORDINATES_COLUMN_ID, placeInfo.getID());
+            contentValues.put(SUBLOCATIONS_COORDINATES_ID, sublocation.getPlaceID());
             long result = db.insert(TABLE_SUBLOCATIONS, null, contentValues);
             if (result == -1) {
                 return -1;
@@ -103,15 +104,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @return List with all buildings
      */
-    public List<PlaceInfo> getPlaces() {
+    public List<String> getPlacesNames() {
         SQLiteDatabase db = this.getWritableDatabase();
-        List<PlaceInfo> places = new ArrayList<>();
-        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_COORDINATES, null);
-        if (res.getCount() == 0) {
-            return places;
-        }
+        List<String> names = new ArrayList<>();
+        Cursor res = db.rawQuery("SELECT " + SUBLOCATIONS_COLUMN_NAME + " FROM " + TABLE_SUBLOCATIONS, null);
         while (res.moveToNext()) {
-            PlaceInfo placeInfo = new PlaceInfo();
+            names.add(res.getString(0));
+        }
+        res.close();
+        return names;
+    }
+
+    public PlaceInfo getPlace(String placeName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        List<Sublocation> sublocations = new ArrayList<>();
+        Cursor res2 = db.rawQuery("SELECT * FROM " + TABLE_SUBLOCATIONS + " WHERE " + SUBLOCATIONS_COLUMN_NAME + "='" + placeName + "'", null);
+        while (res2.moveToNext()) {
+            Sublocation sublocation = new Sublocation();
+            sublocation.setId(res2.getInt(0));
+            sublocation.setCode(res2.getString(1));
+            sublocation.setName(res2.getString(2));
+            sublocation.setPlaceID(res2.getInt(3));
+            sublocations.add(sublocation);
+        }
+        PlaceInfo placeInfo = new PlaceInfo();
+        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_COORDINATES + " WHERE " + COORDINATES_COLUMN_ID + "=" + sublocations.get(0).getPlaceID(), null);
+        while (res.moveToNext()) {
             placeInfo.setID(res.getInt(0));
             placeInfo.setTitle(res.getString(1));
             placeInfo.setPlaceNumber(res.getString(2));
@@ -120,22 +138,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             double lat = Double.valueOf(res.getString(5));
             placeInfo.setGeoPoint(new GeoPoint(lat, lon));
             placeInfo.setDescription(res.getString(6));
-            places.add(placeInfo);
+            placeInfo.setSublocations(sublocations);
         }
-        for (PlaceInfo place : places) {
-            List<Sublocation> sublocations = new ArrayList<>();
-            Cursor res2 = db.rawQuery("SELECT * FROM " + TABLE_SUBLOCATIONS + " WHERE " + SUBLOCATIONS_COORDINATES_ID + "=" + place.getID(), null);
-            while (res2.moveToNext()) {
-                Sublocation sublocation = new Sublocation();
-                sublocation.setId(res2.getInt(0));
-                sublocation.setCode(res2.getString(1));
-                sublocation.setName(res2.getString(2));
-                sublocations.add(sublocation);
-            }
-            place.setSublocations(sublocations);
-            res2.close();
-        }
+        res2.close();
         res.close();
-        return places;
+        return placeInfo;
     }
+
 }

@@ -1,4 +1,4 @@
-package pl.lodz.p.navapp;
+package pl.lodz.p.navapp.domain;
 
 import android.location.Location;
 
