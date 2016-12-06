@@ -73,8 +73,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getApplicationContext().deleteDatabase(DATABASE_NAME);
         cordinatesDB = new DatabaseHelper(this);
+        getApplicationContext().deleteDatabase(DATABASE_NAME);
         setContentView(R.layout.activity_main);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions();
@@ -99,6 +99,29 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         autocompleteLocation = (AutoCompleteTextView) findViewById(R.id.mySearchView);
+        names.add("CH Sukcesja");
+        //test placeinfo
+        PlaceInfo placeInfo = new PlaceInfo();
+        placeInfo.setID(1);
+        placeInfo.setTitle("CH Sukcesja");
+        placeInfo.setAddress("Politechniki 1");
+        placeInfo.setPlaceNumber("W6");
+        GeoPoint geoPoint = new GeoPoint(51.750647,19.449435);
+        placeInfo.setGeoPoint(geoPoint);
+        placeInfo.setDescription("http://sukcesja.eu/");
+        Sublocation sublocation = new Sublocation();
+        sublocation.setId(2);
+        sublocation.setName("CH Sukcesja");
+        sublocation.setCode("204");
+        List<Sublocation> sublocations = new ArrayList<>();
+        sublocations.add(sublocation);
+        placeInfo.setSublocations(sublocations);
+        cordinatesDB.insertPlace(placeInfo);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplication(), R.layout.my_list_layout, names);
+        autocompleteLocation.setAdapter(adapter);
+        //test placeinfo
+
+
         //  checkDatabaseVersion();
     }
 
