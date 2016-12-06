@@ -46,6 +46,75 @@ public class DatabaseConstants {
 
     static final String DROP_SUBLOCATIONS_TABLE = "DROP TABLE IF EXISTS" + TABLE_SUBLOCATIONS;
 
+    //UNIVERSITY CLASS RESOURCE
+
+
+    //UNIVERSITY CLASS TABLE
+    static final String TABLE_CLASS = "CLASS";
+    static final String CLASS_COLUMN_ID = "CLASS_ID";
+    static final String CLASS_COLUMN_NAME = "CLASS_NAME";
+    static final String CLASS_COLUMN_MODULE_CODE = "CLASS_MODULE_CODE";
+    static final String CLASS_COLUMN_DESCRIPTION = "CLASS_DESCRIPTION";
+    static final String CLASS_COLUMN_TYPE = "CLASS_TYPE";
+    static final String CLASS_COLUMN_START_HOUR = "CLASS_START_HOUR";
+    static final String CLASS_COLUMN_END_HOUR = "CLASS_END_HOUR";
+    static final String CLASS_COLUMN_WEEKDAY = "CLASS_WEEKDAY";
+
+    private static final String CLASS_LECTURER_ID = "CLASS_LECTURER_ID" ;
+
+
+
+    //SUBCLASSES WEEK
+    static final String TABLE_WEEKS = "WEEKS";
+    static final String WEEK_COLUMN_ID = "WEEK_ID";
+    static final String WEEK_COLUMN_NUMBER = "WEEK_NUMBER";
+    static final String WEEK_COLUMN_STARTDATE = "WEEK_STARTDATE";
+    static final String WEEK_COLUMN_ENDDATE = "WEEK_ENDATE";
+
+    static final String TABLE_WEEKS_CREATE_QUERY = "create table "
+            + TABLE_WEEKS + "("
+            + WEEK_COLUMN_ID + " INTEGER PRIMARY KEY, "
+            + WEEK_COLUMN_NUMBER + " INTEGER, "
+            + WEEK_COLUMN_STARTDATE + " TEXT, "
+            + WEEK_COLUMN_ENDDATE + " TEXT) ";
+
+
+
+    static final String TABLE_LECTURERS = "LECTRURERS";
+    static final String LECTURERS_COLUMN_ID= "LECTURERS_ID";
+    static final String LECTURERS_COLUMN_FIRSTNAME= "LECTURERS_FIRSTNAME";
+    static final String LECTURERS_COLUMN_LASTNAME= "LECTURERS_LASTNAME";
+    static final String LECTURERS_COLUMN_TITLE= "LECTURERS_TITLE";
+    static final String LECTURERS_COLUMN_DESCRIPTION= "LECTURERS_DESCRIPTION";
+    static final String LECTURERS_COLUMN_MAIL= "LECTURERS_MAIL";
+
+    static final String TABLE_LECTURERS_CREATE_QUERY = "create table "
+            + TABLE_LECTURERS + "("
+            + LECTURERS_COLUMN_ID + " INTEGER PRIMARY KEY, "
+            + LECTURERS_COLUMN_FIRSTNAME + " TEXT, "
+            + LECTURERS_COLUMN_LASTNAME + " TEXT, "
+            + LECTURERS_COLUMN_TITLE + " TEXT) "
+            + LECTURERS_COLUMN_DESCRIPTION + " TEXT, "
+            + LECTURERS_COLUMN_MAIL + " TEXT) ";
+
+
+    static final String TABLE_CLASS_CREATE_QUERY = "create table "
+            + TABLE_CLASS + "("
+            + CLASS_COLUMN_ID + " INTEGER PRIMARY KEY, "
+            + CLASS_COLUMN_NAME + " TEXT, "
+            + CLASS_COLUMN_MODULE_CODE + " TEXT, "
+            + CLASS_COLUMN_DESCRIPTION + " TEXT, "
+            + CLASS_COLUMN_TYPE + " TEXT,"
+            + CLASS_COLUMN_START_HOUR + " INTEGER, "
+            + CLASS_COLUMN_END_HOUR + " INTEGER, "
+            + CLASS_COLUMN_WEEKDAY + " TEXT, "
+            + CLASS_LECTURER_ID + " INTEGER, FOREIGN KEY ("
+            + CLASS_LECTURER_ID + ") REFERENCES " + TABLE_LECTURERS + "(" + LECTURERS_COLUMN_ID + "))";
+
+    static final String DROP_CLASS_TABLE = "DROP TABLE IF EXISTS" + TABLE_CLASS;
+
+    static final String DROP_LECTURERS_TABLE = "DROP TABLE IF EXISTS" + TABLE_LECTURERS;
+
     private DatabaseConstants(){
 
     }

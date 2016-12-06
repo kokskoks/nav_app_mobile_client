@@ -30,12 +30,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(COORDINATES_TABLE_CREATE_QUERY);
         db.execSQL(SUBLOCATIONS_TABLE_CREATE_QUERY);
+        db.execSQL(TABLE_LECTURERS_CREATE_QUERY);
+        db.execSQL(TABLE_CLASS_CREATE_QUERY);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(DROP_COORDINATES_TABLE);
         db.execSQL(DROP_SUBLOCATIONS_TABLE);
+        db.execSQL(DROP_LECTURERS_TABLE);
+        db.execSQL(DROP_CLASS_TABLE);
         onCreate(db);
     }
 
