@@ -33,10 +33,12 @@ import android.widget.TextView;
 
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
@@ -53,7 +55,7 @@ import pl.lodz.p.navapp.domain.NavigationInfo;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.service.DatabaseHelper;
 
-public class MapFragment extends Fragment implements LocationListener {
+public class MapFragment extends Fragment implements LocationListener, MapEventsReceiver {
     private MapView mMapView;
     private MapController mMapController;
     public static final int MAX_ZOOM_LEVEL = 20;
@@ -104,6 +106,9 @@ public class MapFragment extends Fragment implements LocationListener {
         if (buildingInfoMarker) {
             mMapController.animateTo(point);
         }
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this.getContext(), this);
+        mMapView.getOverlays().add(0, mapEventsOverlay);
     }
 
     private void setupMap(View view) {
@@ -257,6 +262,17 @@ public class MapFragment extends Fragment implements LocationListener {
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
         }
+    }
+
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
+        InfoWindow.closeAllInfoWindowsOn(mMapView);
+        return true;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint geoPoint) {
+        return false;
     }
 
     private class MyInfoWindow extends InfoWindow {
