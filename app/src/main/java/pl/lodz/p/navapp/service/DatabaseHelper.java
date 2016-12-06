@@ -28,6 +28,7 @@ import java.util.Map;
 import pl.lodz.p.navapp.NavAppApplication;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.activity.MainActivity;
+import pl.lodz.p.navapp.domain.Classes;
 import pl.lodz.p.navapp.domain.Lecture;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
@@ -187,6 +188,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         res.close();
         return lecture;
+    }
+
+    public Classes getClassbyId(int ID){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Classes classes = new Classes();
+        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_LECTURERS + " WHERE " + CLASS_COLUMN_ID + "='" + ID + "'", null); // brak pewnosci
+        while(res.moveToNext()) {
+            classes.setID(res.getInt(0));
+            classes.setName(res.getString(1));
+            classes.setModuleCode(res.getString(2));
+            classes.setDescription(res.getString(3));
+            classes.setType(res.getString(4));
+            classes.setStartHour(res.getInt(5));
+            classes.setEndHour(res.getInt(6));
+            classes.setWeekday(res.getInt(7));
+            //skad wziac recturerID
+        }
+        res.close();
+        return classes;
     }
 
     public int checkDBVersion() {

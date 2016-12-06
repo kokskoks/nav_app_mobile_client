@@ -12,11 +12,11 @@ public class Classes {
     private String type;
     private int startHour;
     private int endHour;
-    private String weekday;
+    private int weekday;
     private int lecturerID;
 
 
-    public Classes(int ID, String name, String moduleCode, String description, String type, int startHour, int endHour, String weekday, int lecturerID) {
+    public Classes(int ID, String name, String moduleCode, String description, String type, int startHour, int endHour, int weekday, int lecturerID) {
         this.ID = ID;
         this.name = name;
         this.moduleCode = moduleCode;
@@ -26,6 +26,10 @@ public class Classes {
         this.endHour = endHour;
         this.weekday = weekday;
         this.lecturerID = lecturerID;
+    }
+
+    public Classes() {
+
     }
 
     public int getID() {
@@ -84,11 +88,11 @@ public class Classes {
         this.endHour = endHour;
     }
 
-    public String getWeekday() {
+    public int getWeekday() {
         return weekday;
     }
 
-    public void setWeekday(String weekday) {
+    public void setWeekday(int weekday) {
         this.weekday = weekday;
     }
 
