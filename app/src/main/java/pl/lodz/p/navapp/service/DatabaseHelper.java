@@ -5,15 +5,33 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Base64;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import pl.lodz.p.navapp.NavAppApplication;
+import pl.lodz.p.navapp.R;
+import pl.lodz.p.navapp.activity.MainActivity;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
 
+import static pl.lodz.p.navapp.activity.MainActivity.URL;
 import static pl.lodz.p.navapp.service.DatabaseConstants.*;
 
 /**
@@ -21,9 +39,13 @@ import static pl.lodz.p.navapp.service.DatabaseConstants.*;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    private Context context;
+
+    private int version = -1;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
+        this.context = context;
     }
 
     @Override
@@ -147,6 +169,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         res2.close();
         res.close();
         return placeInfo;
+    }
+
+    public int checkDBVersion() {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL + "/versions", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONArray array = new JSONArray(response);
+                    JSONObject versionObject = array.getJSONObject(0);
+                    version = Integer.parseInt(versionObject.getString("ver"));
+                    Toast.makeText(context, "Wersja bazy budynków " + version, Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    version = -1;
+                    Toast.makeText(context, "Błąd podczas parsowania wersji", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                version = -1;
+                Toast.makeText(context, "Błąd podczas pobierania wersji bazy", Toast.LENGTH_SHORT).show();
+            }
+        }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> params = new HashMap<>();
+                String creds = String.format("%s:%s", "user", "user");
+                String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
+                params.put("Authorization", auth);
+                return params;
+            }
+        };
+        NavAppApplication.getInstance().addToRequestQueue(stringRequest);
+        return version;
     }
 
 }

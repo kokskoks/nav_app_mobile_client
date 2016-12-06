@@ -1,7 +1,5 @@
 package pl.lodz.p.navapp.domain;
 
-import pl.lodz.p.navapp.Teacher;
-
 /**
  * Created by Calgon on 2016-11-22.
  */

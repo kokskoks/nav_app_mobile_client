@@ -2,6 +2,7 @@ package pl.lodz.p.navapp.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -15,6 +16,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -32,6 +34,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,20 +54,26 @@ import pl.lodz.p.navapp.fragment.MapFragment;
 import pl.lodz.p.navapp.fragment.TimetableFragment;
 import pl.lodz.p.navapp.service.DatabaseHelper;
 
+import static pl.lodz.p.navapp.service.DatabaseConstants.DATABASE_NAME;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
 
     private static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
+    public static final int FILE_READ_ERROR = -2;
+    public static final int NO_INTERNET_ACCESS = -1;
 
     private DatabaseHelper cordinatesDB;
-    private static final String URL = "https://nav-app.herokuapp.com/api/buildings";
+    public static final String URL = "https://nav-app.herokuapp.com/api";
     private List<PlaceInfo> placeInfos;
     private AutoCompleteTextView autocompleteLocation;
     private List<String> names;
+    private int version;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getApplicationContext().deleteDatabase(DATABASE_NAME);
         cordinatesDB = new DatabaseHelper(this);
         setContentView(R.layout.activity_main);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -85,11 +99,63 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         autocompleteLocation = (AutoCompleteTextView) findViewById(R.id.mySearchView);
-        if (cordinatesDB.isPlacesEmpty()) {
-            getTimetableInfo();
+        //  checkDatabaseVersion();
+    }
+
+    private void checkDatabaseVersion() {
+        int version = cordinatesDB.checkDBVersion();
+        if (version != NO_INTERNET_ACCESS) {
+            int localVersion = readFromFile(this);
+            if (localVersion == FILE_READ_ERROR || version != localVersion) {
+                getTimetableInfo();
+            } else {
+                populateFromDatabase();
+            }
         } else {
             populateFromDatabase();
         }
+    }
+
+    private void writeVersionToFile(int data, Context context) {
+        try {
+            String version = String.valueOf(data);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("version.txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(version);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    private int readFromFile(Context context) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput("version.txt");
+
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        } catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+            return -2;
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+            return -2;
+        }
+
+        return Integer.parseInt(ret);
     }
 
     private void populateFromDatabase() {
@@ -99,7 +165,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getTimetableInfo() {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL + "/buildings", new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -109,6 +175,7 @@ public class MainActivity extends AppCompatActivity
                     names = cordinatesDB.getPlacesNames();
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplication(), R.layout.my_list_layout, names);
                     autocompleteLocation.setAdapter(adapter);
+                    writeVersionToFile(version, getApplicationContext());
                     Toast.makeText(getApplicationContext(), "Pomyślnie sparsowano", Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     Toast.makeText(getApplicationContext(), "Błąd podczas parsowania danych", Toast.LENGTH_SHORT).show();

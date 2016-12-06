@@ -1,4 +1,4 @@
-package pl.lodz.p.navapp;
+package pl.lodz.p.navapp.domain;
 
 /**
  * Created by Calgon on 2016-11-22.
