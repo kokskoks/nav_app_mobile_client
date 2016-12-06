@@ -28,6 +28,7 @@ import java.util.Map;
 import pl.lodz.p.navapp.NavAppApplication;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.activity.MainActivity;
+import pl.lodz.p.navapp.domain.Lecture;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
 
@@ -141,6 +142,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return names;
     }
 
+
     public PlaceInfo getPlace(String placeName) {
         SQLiteDatabase db = this.getWritableDatabase();
         List<Sublocation> sublocations = new ArrayList<>();
@@ -169,6 +171,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         res2.close();
         res.close();
         return placeInfo;
+    }
+
+    public Lecture getLecturer(int ID){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Lecture lecture = new Lecture();
+        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_LECTURERS + " WHERE " + LECTURERS_COLUMN_ID + "='" + ID + "'", null); // brak pewnosci czy dobry select :) do sprawdzenia
+        while(res.moveToNext()){
+            lecture.setID(res.getInt(2));
+            lecture.setFirstName(res.getString(1));
+            lecture.setLastName(res.getString(3));
+            lecture.setDescription(res.getString(0));
+            lecture.setMail(res.getString(4));
+            lecture.setTitle(res.getString(5));
+        }
+        res.close();
+        return lecture;
     }
 
     public int checkDBVersion() {
