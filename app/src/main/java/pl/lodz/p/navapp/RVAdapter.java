@@ -10,16 +10,17 @@ import android.widget.TextView;
 import java.util.List;
 
 import pl.lodz.p.navapp.domain.ClassInfo;
+import pl.lodz.p.navapp.domain.Classes;
 
 /**
  * Created by Łukasz Świtoń on 24.11.2016.
  */
 
 public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ClassesViewHolder>{
-    private List<ClassInfo> classes;
+    private List<Classes> classes;
 
 
-    public RVAdapter(List<ClassInfo> classes){
+    public RVAdapter(List<Classes> classes){
         this.classes = classes;
     }
     @Override
@@ -38,9 +39,9 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ClassesViewHolder>
     @Override
     public void onBindViewHolder(ClassesViewHolder holder, int position) {
         holder.nazwaPrzedmiotu.setText(classes.get(position).getName());
-        holder.budynek.setText(classes.get(position).getBuilding());
-        holder.godzinaOd.setText(classes.get(position).getFrom());
-        holder.godzinaDo.setText(classes.get(position).getTo());
+        holder.budynek.setText(classes.get(position).getType());
+        holder.godzinaOd.setText(String.valueOf(classes.get(position).getStartHour()));
+        holder.godzinaDo.setText(String.valueOf(classes.get(position).getEndHour()));
     }
 
     @Override

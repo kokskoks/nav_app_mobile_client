@@ -51,6 +51,7 @@ import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.domain.Classes;
 import pl.lodz.p.navapp.domain.Classroom;
+import pl.lodz.p.navapp.domain.Group;
 import pl.lodz.p.navapp.domain.Lecturer;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
@@ -228,58 +229,7 @@ public class MainActivity extends AppCompatActivity
             cordinatesDB.insertPlace(placeInfos.get(i));
         }
     }
-    private List<Classes> classesList;
-    private void translateResponeClasses(String response) throws JSONException {
-        JSONArray array = new JSONArray(response);
-        for (int i = 0; i < array.length(); i++) {
-            Classes classes = new Classes();
-            JSONObject object = (JSONObject) array.get(i);
-            classes.setID(Integer.parseInt(object.getString("id")));
-            classes.setName(object.getString("name").trim());
-            classes.setModuleCode(object.getString("moduleCode").trim());
-            classes.setDescription(object.getString("description").trim());
-            classes.setType(object.getString("type").trim());
-            classes.setStartHour(Integer.parseInt(object.getString("startHour").trim()));
-            classes.setEndHour(Integer.parseInt(object.getString("endHour").trim()));
-            classes.setWeekday(object.getString("weekDay").trim());
-            classesList.add(classes);
-        }
-    }
-
-    private List<Classroom> classroomList;
-    private void translateResponeClassroom(String response) throws JSONException {
-        JSONArray array = new JSONArray(response);
-        for (int i = 0; i < array.length(); i++) {
-            Classroom classroom = new Classroom();
-            JSONObject object = (JSONObject) array.get(i);
-            classroom.setID(Integer.parseInt(object.getString("id")));
-            classroom.setName(object.getString("name").trim());
-            classroom.setDescription(object.getString("description").trim());
-            classroom.setFloor(Integer.parseInt(object.getString("floor").trim()));
-            classroomList.add(classroom);
-        }
-    }
-    private List<Lecturer> lecturerList;
-    private void translateResponeLecturer(String response) throws JSONException {
-        JSONArray array = new JSONArray(response);
-        for (int i = 0; i < array.length(); i++) {
-            Lecturer lecturer = new Lecturer();
-            JSONObject object = (JSONObject) array.get(i);
-            lecturer.setID(Integer.parseInt(object.getString("id")));
-            lecturer.setFirstName(object.getString("firstName").trim());
-            lecturer.setLastName(object.getString("lastName").trim());
-            lecturer.setTitle(object.getString("title").trim());
-            lecturer.setDescription(object.getString("description").trim());
-            lecturer.setMail(object.getString("mail").trim());
-            lecturerList.add(lecturer);
-        }
-    }
-
-
-
-
-
-
+    
     private void translateResponsePlaceInfo(String response) throws JSONException {
         JSONArray array = new JSONArray(response);
         for (int i = 0; i < array.length(); i++) {
@@ -310,6 +260,53 @@ public class MainActivity extends AppCompatActivity
             placeInfos.add(placeInfo);
         }
     }
+  //  private List<Lecturer> lecturerList;
+//    private void translateResponeLecturer(String response) throws JSONException {
+//        JSONArray array = new JSONArray(response);
+//        for (int i = 0; i < array.length(); i++) {
+//            Lecturer lecturer = new Lecturer();
+//            JSONObject object = (JSONObject) array.get(i);
+//            lecturer.setID(Integer.parseInt(object.getString("id")));
+//            lecturer.setFirstName(object.getString("firstName").trim());
+//            lecturer.setLastName(object.getString("lastName").trim());
+//            lecturer.setTitle(object.getString("title").trim());
+//            lecturer.setDescription(object.getString("description").trim());
+//            lecturer.setMail(object.getString("mail").trim());
+//            lecturerList.add(lecturer);
+//        }
+//    }
+
+ //   private List<Classroom> classroomList;
+//    private void translateResponeClassroom(String response) throws JSONException {
+//        JSONArray array = new JSONArray(response);
+//        for (int i = 0; i < array.length(); i++) {
+//            Classroom classroom = new Classroom();
+//            JSONObject object = (JSONObject) array.get(i);
+//            classroom.setID(Integer.parseInt(object.getString("id")));
+//            classroom.setName(object.getString("name").trim());
+//            classroom.setDescription(object.getString("description").trim());
+//            classroom.setFloor(Integer.parseInt(object.getString("floor").trim()));
+//            classroomList.add(classroom);
+//        }
+//    }
+
+
+  //  private void translateResponeClasses(String response) throws JSONException {
+//        JSONArray array = new JSONArray(response);
+//        for (int i = 0; i < array.length(); i++) {
+//            Classes classes = new Classes();
+//            JSONObject object = (JSONObject) array.get(i);
+//            classes.setID(Integer.parseInt(object.getString("id")));
+//            classes.setName(object.getString("name").trim());
+//            classes.setModuleCode(object.getString("moduleCode").trim());
+//            classes.setDescription(object.getString("description").trim());
+//            classes.setType(object.getString("type").trim());
+//            classes.setStartHour(Integer.parseInt(object.getString("startHour").trim()));
+//            classes.setEndHour(Integer.parseInt(object.getString("endHour").trim()));
+//            classes.setWeekday(object.getString("weekDay").trim());
+//            classesList.add(classes);
+//        }
+//    }
 
     @Override
     public void onBackPressed() {

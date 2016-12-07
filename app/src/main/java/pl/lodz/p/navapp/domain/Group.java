@@ -1,5 +1,7 @@
 package pl.lodz.p.navapp.domain;
 
+import java.util.List;
+
 /**
  * Created by Calgon on 2016-12-07.
  */
@@ -10,6 +12,9 @@ public class Group {
     private String description;
     private String semester;
     private String specialisation;
+    private List<Classes> classesList;
+    private List<Lecturer> lecturerList;
+    private Classroom classroom;
 
     public Group() {
     }
@@ -81,5 +86,29 @@ public class Group {
                 ", semester='" + semester + '\'' +
                 ", specialisation='" + specialisation + '\'' +
                 '}';
+    }
+
+    public List<Classes> getClassesList() {
+        return classesList;
+    }
+
+    public void setClassesList(List<Classes> classesList) {
+        this.classesList = classesList;
+    }
+
+    public List<Lecturer> getLecturerList() {
+        return lecturerList;
+    }
+
+    public void setLecturerList(List<Lecturer> lecturerList) {
+        this.lecturerList = lecturerList;
+    }
+
+    public Classroom getClassroom() {
+        return classroom;
+    }
+
+    public void setClassroom(Classroom classroom) {
+        this.classroom = classroom;
     }
 }
