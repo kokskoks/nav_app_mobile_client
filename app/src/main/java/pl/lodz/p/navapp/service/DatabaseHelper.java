@@ -30,7 +30,7 @@ import pl.lodz.p.navapp.domain.Lecturer;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
 
-import static pl.lodz.p.navapp.activity.MainActivity.URL;
+import static pl.lodz.p.navapp.ApplicationConstants.URL;
 import static pl.lodz.p.navapp.service.DatabaseConstants.*;
 
 /**
