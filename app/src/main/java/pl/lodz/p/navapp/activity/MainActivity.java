@@ -50,6 +50,7 @@ import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.domain.Classes;
 import pl.lodz.p.navapp.domain.Classroom;
+import pl.lodz.p.navapp.domain.Lecturer;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
 import pl.lodz.p.navapp.fragment.MapFragment;
@@ -261,8 +262,24 @@ public class MainActivity extends AppCompatActivity
             classroomList.add(classroom);
         }
     }
+    private List<Lecturer> lecturerList;
+    private void translateResponeLecturer(String response) throws JSONException {
+        JSONArray array = new JSONArray(response);
+        for (int i = 0; i < array.length(); i++) {
+            Lecturer lecturer = new Lecturer();
+            JSONObject object = (JSONObject) array.get(i);
+            lecturer.setID(Integer.parseInt(object.getString("id")));
+            lecturer.setFirstName(object.getString("firstName").trim());
+            lecturer.setLastName(object.getString("lastName").trim());
+            lecturer.setTitle(object.getString("title").trim());
+            lecturer.setDescription(object.getString("description").trim());
+            lecturer.setMail(object.getString("mail").trim());
+            lecturerList.add(lecturer);
+        }
+    }
 
-    
+
+
 
 
 
