@@ -2,12 +2,14 @@ package pl.lodz.p.navapp.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -15,12 +17,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -56,22 +64,24 @@ import pl.lodz.p.navapp.domain.Sublocation;
 import pl.lodz.p.navapp.fragment.MapFragment;
 import pl.lodz.p.navapp.fragment.TimetableFragment;
 import pl.lodz.p.navapp.service.DatabaseHelper;
+import pl.lodz.p.navapp.service.RequestManager;
 
+import static pl.lodz.p.navapp.ApplicationConstants.FILE_READ_ERROR;
+import static pl.lodz.p.navapp.ApplicationConstants.NO_INTERNET_ACCESS;
+import static pl.lodz.p.navapp.ApplicationConstants.URL;
+import static pl.lodz.p.navapp.ApplicationConstants.VERSION_FILE_NAME;
 import static pl.lodz.p.navapp.service.DatabaseConstants.DATABASE_NAME;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
 
     private static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
-    public static final int FILE_READ_ERROR = -2;
-    public static final int NO_INTERNET_ACCESS = -1;
-
     private DatabaseHelper cordinatesDB;
-    public static final String URL = "https://nav-app.herokuapp.com/api";
     private List<PlaceInfo> placeInfos;
     private AutoCompleteTextView autocompleteLocation;
     private List<String> names;
     private int version;
+    private Fragment lastAddedFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,12 +134,11 @@ public class MainActivity extends AppCompatActivity
         autocompleteLocation.setAdapter(adapter);
         //test placeinfo
 
-
-        //  checkDatabaseVersion();
+          checkDatabaseVersion();
     }
 
     private void checkDatabaseVersion() {
-        int version = cordinatesDB.checkDBVersion();
+        version = cordinatesDB.checkDBVersion();
         if (version != NO_INTERNET_ACCESS) {
             int localVersion = readFromFile(this);
             if (localVersion == FILE_READ_ERROR || version != localVersion) {
@@ -145,7 +154,7 @@ public class MainActivity extends AppCompatActivity
     private void writeVersionToFile(int data, Context context) {
         try {
             String version = String.valueOf(data);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("version.txt", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(VERSION_FILE_NAME, Context.MODE_PRIVATE));
             outputStreamWriter.write(version);
             outputStreamWriter.close();
         } catch (IOException e) {
@@ -158,7 +167,7 @@ public class MainActivity extends AppCompatActivity
         String ret = "";
 
         try {
-            InputStream inputStream = context.openFileInput("version.txt");
+            InputStream inputStream = context.openFileInput(VERSION_FILE_NAME);
 
             if (inputStream != null) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -175,10 +184,10 @@ public class MainActivity extends AppCompatActivity
             }
         } catch (FileNotFoundException e) {
             Log.e("login activity", "File not found: " + e.toString());
-            return -2;
+            return FILE_READ_ERROR;
         } catch (IOException e) {
             Log.e("login activity", "Can not read file: " + e.toString());
-            return -2;
+            return FILE_READ_ERROR;
         }
 
         return Integer.parseInt(ret);
@@ -191,8 +200,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getTimetableInfo() {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL + "/buildings", new Response.Listener<String>() {
-
+        RequestManager.sendRequest(Request.Method.GET, URL + "/buildings", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -212,18 +220,7 @@ public class MainActivity extends AppCompatActivity
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(getApplicationContext(), "Błąd podczas pobierania danych", Toast.LENGTH_SHORT).show();
             }
-        }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> params = new HashMap<>();
-                String creds = String.format("%s:%s", "user", "user");
-                String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
-                params.put("Authorization", auth);
-                return params;
-            }
-        };
-        NavAppApplication.getInstance().addToRequestQueue(stringRequest);
+        });
     }
 
     private void insertToDatabase() {
@@ -336,8 +333,29 @@ public class MainActivity extends AppCompatActivity
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
 
     }
-
-    @SuppressWarnings("StatementWithEmptyBody")
+    private void initDialog(final Dialog dialog) {
+        dialog.setContentView(R.layout.group_choser_dialog);
+        Button ok = (Button) dialog.findViewById(R.id.groupConfirmButton);
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                TimetableFragment timetableFragment = new TimetableFragment();
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, timetableFragment);
+                fragmentTransaction.commit();
+                lastAddedFragment = timetableFragment;
+            }
+        });
+        Button cancel = (Button) dialog.findViewById(R.id.group_cancel_button);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -348,11 +366,12 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, mapFragment);
             fragmentTransaction.commit();
+            lastAddedFragment = mapFragment;
         } else if (id == R.id.nav_timetable) {
-            TimetableFragment timetableFragment = new TimetableFragment();
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container, timetableFragment);
-            fragmentTransaction.commit();
+            if(lastAddedFragment == null || lastAddedFragment instanceof MapFragment) {
+                final Dialog dialog = new Dialog(this);
+                initDialog(dialog);
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
