@@ -90,7 +90,6 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
         super.onCreate(savedInstanceState);
         MainActivity mainActivity = (MainActivity) getActivity();
         db = mainActivity.getCordinatesDB();
-        namesList = ((MainActivity) getActivity()).getNames();
         setRetainInstance(true);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
     }
@@ -101,7 +100,7 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
         marker.setPosition(point);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
-        InfoWindow infoWindow = new MyInfoWindow(R.layout.bubble, mMapView);
+        InfoWindow infoWindow = new MyInfoWindow(R.layout.bubble, mMapView,place);
 
         marker.setInfoWindow(infoWindow);
         if (buildingInfoMarker) {
@@ -166,6 +165,7 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
                 }
             }
         });
+        namesList = ((MainActivity) getActivity()).getNames();
         return view;
     }
 
@@ -216,6 +216,7 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
                 }
             }
         });
+        namesList = db.getPlacesNames();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.my_list_layout, namesList);
         dialogFromLocation.setAdapter(adapter);
         dialogToLocation.setAdapter(adapter);
@@ -225,7 +226,6 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
             public void onClick(View view) {
                 String fromLocation = dialogFromLocation.getText().toString();
                 String toLocation = dialogToLocation.getText().toString();
-                from = db.getPlace(fromLocation.trim());
                 to = db.getPlace(toLocation.trim());
                 if (currentLocation.isChecked()) {
                     PlaceInfo currentPosition = findCurrentLocation();
@@ -235,6 +235,7 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
                     }
                 } else {
                     fromCurrentLocation = false;
+                    from = db.getPlace(fromLocation.trim());
                 }
                 if (from != null && to != null) {
                     drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId());
@@ -264,6 +265,9 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
                 mMapView.getOverlays().add(marker);
                 mMapView.invalidate();
                 mMapController.animateTo(currentLocationGeoPoint);
+
+                MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this.getContext(), this);
+                mMapView.getOverlays().add(0, mapEventsOverlay);
             }
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
@@ -282,8 +286,10 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
     }
 
     private class MyInfoWindow extends InfoWindow {
-        public MyInfoWindow(int layoutResId, MapView mapView) {
+        private PlaceInfo info;
+        public MyInfoWindow(int layoutResId, MapView mapView, PlaceInfo place) {
             super(layoutResId, mapView);
+            this.info=place;
         }
 
         @Override
@@ -292,17 +298,17 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
 
         @Override
         public void onOpen(Object arg0) {
-            ImageView infoImage =  (ImageView) mView.findViewById(R.id.bubble_image);
+            //ImageView infoImage =  (ImageView) mView.findViewById(R.id.bubble_image);
             Button btnMoreInfo = (Button) mView.findViewById(R.id.goToInternet);
             TextView txtTitle = (TextView) mView.findViewById(R.id.bubble_title);
             TextView txtDescription = (TextView) mView.findViewById(R.id.bubble_description);
 
-            txtTitle.setText(placeInfo.getTitle());
-            txtDescription.setText(placeInfo.getAddress());
+            txtTitle.setText(this.info.getTitle());
+            txtDescription.setText(this.info.getAddress());
             //infoImage.setBackground(getResources().getDrawable());
             btnMoreInfo.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    openWebURL(placeInfo.getDescription());
+                    openWebURL(info.getDescription());
                 }
             });
         }

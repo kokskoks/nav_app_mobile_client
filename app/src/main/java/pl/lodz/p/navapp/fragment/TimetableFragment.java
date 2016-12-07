@@ -52,7 +52,7 @@ public class TimetableFragment extends Fragment {
         RecyclerView rv = (RecyclerView)view.findViewById(R.id.group_recycler_view);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),1);
         rv.setLayoutManager(gridLayoutManager);
-        RequestManager.sendRequest(Request.Method.GET, URL + "/university-groups/"+String.valueOf(this.groupID), new Response.Listener() {
+        RequestManager.sendRequest(Request.Method.GET, URL + "/university-groups/"+this.groupID, new Response.Listener() {
             @Override
             public void onResponse(Object response) {
                 //CALGON TU WSTAW TRANSFORMACJE
