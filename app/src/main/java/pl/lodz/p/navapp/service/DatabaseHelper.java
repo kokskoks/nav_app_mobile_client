@@ -219,7 +219,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             classes.setType(res.getString(4));
             classes.setStartHour(res.getInt(5));
             classes.setEndHour(res.getInt(6));
-            classes.setWeekday(res.getInt(7));
+            classes.setWeekday(res.getString(7));
             //skad wziac recturerID
         }
         res.close();
@@ -238,8 +238,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             classes.setType(res.getString(4));
             classes.setStartHour(res.getInt(5));
             classes.setEndHour(res.getInt(6));
+<<<<<<< HEAD
+            classes.setWeekday(res.getString(7));
+            //skad wziac recturerID
+=======
             classes.setWeekday(res.getInt(7));
             //skad wziac lecturerID
+>>>>>>> b065ddadb9ae48f8de51c90b5b263e62b88bec92
         }
         res.close();
         return classes;

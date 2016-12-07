@@ -20,6 +20,7 @@ public class PlaceInfo {
     private int drawableID;
     private GeoPoint geoPoint;
     private List<Sublocation> sublocations;
+    private List<Classroom> classroom;
 
 
     public PlaceInfo(Location myLocation, int id, String title, String placeNumber, String address, String description, int drawableID) {
