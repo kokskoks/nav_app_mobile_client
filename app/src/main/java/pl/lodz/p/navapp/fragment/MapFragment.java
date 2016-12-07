@@ -55,16 +55,20 @@ import pl.lodz.p.navapp.domain.NavigationInfo;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.service.DatabaseHelper;
 
+import static pl.lodz.p.navapp.ApplicationConstants.MAX_ZOOM_LEVEL;
+import static pl.lodz.p.navapp.ApplicationConstants.TravelType.BIKE;
+import static pl.lodz.p.navapp.ApplicationConstants.TravelType.CAR;
+import static pl.lodz.p.navapp.ApplicationConstants.TravelType.PEDESTRIAN;
+import static pl.lodz.p.navapp.ApplicationConstants.ZOOMLEVEL;
+
 public class MapFragment extends Fragment implements LocationListener, MapEventsReceiver {
     private MapView mMapView;
     private MapController mMapController;
-    public static final int MAX_ZOOM_LEVEL = 20;
-    public static final int ZOOMLEVEL = 17;
     private LocationManager locationManager;
     private OnFragmentInteractionListener mListener;
     private PlaceInfo from;
     private PlaceInfo to;
-    boolean fromCurrentLocation = true;
+    private boolean fromCurrentLocation = true;
     private List<String> namesList;
     private DatabaseHelper db;
 
@@ -178,13 +182,13 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
         waypoints.add(to);
         switch (type) {
             case R.id.bicycleRadioButton:
-                info.setRouteType("bicycle");
+                info.setRouteType(BIKE.getType());
                 break;
             case R.id.carRadioButton:
-                info.setRouteType("fastest");
+                info.setRouteType(CAR.getType());
                 break;
             default:
-                info.setRouteType("pedestrian");
+                info.setRouteType(PEDESTRIAN.getType());
                 break;
         }
         info.setWaypoints(waypoints);

@@ -63,17 +63,17 @@ import pl.lodz.p.navapp.fragment.TimetableFragment;
 import pl.lodz.p.navapp.service.DatabaseHelper;
 import pl.lodz.p.navapp.service.RequestManager;
 
+import static pl.lodz.p.navapp.ApplicationConstants.FILE_READ_ERROR;
+import static pl.lodz.p.navapp.ApplicationConstants.NO_INTERNET_ACCESS;
+import static pl.lodz.p.navapp.ApplicationConstants.URL;
+import static pl.lodz.p.navapp.ApplicationConstants.VERSION_FILE_NAME;
 import static pl.lodz.p.navapp.service.DatabaseConstants.DATABASE_NAME;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
 
     private static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
-    public static final int FILE_READ_ERROR = -2;
-    public static final int NO_INTERNET_ACCESS = -1;
-
     private DatabaseHelper cordinatesDB;
-    public static final String URL = "https://nav-app.herokuapp.com/api";
     private List<PlaceInfo> placeInfos;
     private AutoCompleteTextView autocompleteLocation;
     private List<String> names;
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity
     private void writeVersionToFile(int data, Context context) {
         try {
             String version = String.valueOf(data);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("version.txt", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(VERSION_FILE_NAME, Context.MODE_PRIVATE));
             outputStreamWriter.write(version);
             outputStreamWriter.close();
         } catch (IOException e) {
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity
         String ret = "";
 
         try {
-            InputStream inputStream = context.openFileInput("version.txt");
+            InputStream inputStream = context.openFileInput(VERSION_FILE_NAME);
 
             if (inputStream != null) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -181,10 +181,10 @@ public class MainActivity extends AppCompatActivity
             }
         } catch (FileNotFoundException e) {
             Log.e("login activity", "File not found: " + e.toString());
-            return -2;
+            return FILE_READ_ERROR;
         } catch (IOException e) {
             Log.e("login activity", "Can not read file: " + e.toString());
-            return -2;
+            return FILE_READ_ERROR;
         }
 
         return Integer.parseInt(ret);
