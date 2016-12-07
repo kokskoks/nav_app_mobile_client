@@ -5,14 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Base64;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,18 +17,40 @@ import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import pl.lodz.p.navapp.NavAppApplication;
+import pl.lodz.p.navapp.activity.MainActivity;
 import pl.lodz.p.navapp.domain.Classes;
 import pl.lodz.p.navapp.domain.Lecturer;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
 
-import static pl.lodz.p.navapp.activity.MainActivity.URL;
-import static pl.lodz.p.navapp.service.DatabaseConstants.*;
+import static pl.lodz.p.navapp.ApplicationConstants.URL;
+import static pl.lodz.p.navapp.service.DatabaseConstants.CLASS_COLUMN_ID;
+import static pl.lodz.p.navapp.service.DatabaseConstants.COORDINATES_COLUMN_ADDRESS;
+import static pl.lodz.p.navapp.service.DatabaseConstants.COORDINATES_COLUMN_DESCRIPTION;
+import static pl.lodz.p.navapp.service.DatabaseConstants.COORDINATES_COLUMN_ID;
+import static pl.lodz.p.navapp.service.DatabaseConstants.COORDINATES_COLUMN_LATITUDE;
+import static pl.lodz.p.navapp.service.DatabaseConstants.COORDINATES_COLUMN_LONGITUDE;
+import static pl.lodz.p.navapp.service.DatabaseConstants.COORDINATES_COLUMN_PLACE_NUMBER;
+import static pl.lodz.p.navapp.service.DatabaseConstants.COORDINATES_COLUMN_TITLE;
+import static pl.lodz.p.navapp.service.DatabaseConstants.COORDINATES_TABLE_CREATE_QUERY;
+import static pl.lodz.p.navapp.service.DatabaseConstants.DATABASE_NAME;
+import static pl.lodz.p.navapp.service.DatabaseConstants.DROP_CLASS_TABLE;
+import static pl.lodz.p.navapp.service.DatabaseConstants.DROP_COORDINATES_TABLE;
+import static pl.lodz.p.navapp.service.DatabaseConstants.DROP_LECTURERS_TABLE;
+import static pl.lodz.p.navapp.service.DatabaseConstants.DROP_SUBLOCATIONS_TABLE;
+import static pl.lodz.p.navapp.service.DatabaseConstants.LECTURERS_COLUMN_ID;
+import static pl.lodz.p.navapp.service.DatabaseConstants.SUBLOCATIONS_COLUMN_CODE;
+import static pl.lodz.p.navapp.service.DatabaseConstants.SUBLOCATIONS_COLUMN_ID;
+import static pl.lodz.p.navapp.service.DatabaseConstants.SUBLOCATIONS_COLUMN_NAME;
+import static pl.lodz.p.navapp.service.DatabaseConstants.SUBLOCATIONS_COORDINATES_ID;
+import static pl.lodz.p.navapp.service.DatabaseConstants.SUBLOCATIONS_TABLE_CREATE_QUERY;
+import static pl.lodz.p.navapp.service.DatabaseConstants.TABLE_CLASS_CREATE_QUERY;
+import static pl.lodz.p.navapp.service.DatabaseConstants.TABLE_COORDINATES;
+import static pl.lodz.p.navapp.service.DatabaseConstants.TABLE_LECTURERS;
+import static pl.lodz.p.navapp.service.DatabaseConstants.TABLE_LECTURERS_CREATE_QUERY;
+import static pl.lodz.p.navapp.service.DatabaseConstants.TABLE_SUBLOCATIONS;
 
 /**
  * Created by Calgon on 2016-11-13.
@@ -218,19 +237,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             classes.setType(res.getString(4));
             classes.setStartHour(res.getInt(5));
             classes.setEndHour(res.getInt(6));
-<<<<<<< HEAD
             classes.setWeekday(res.getString(7));
-            //skad wziac recturerID
-=======
-            classes.setWeekday(res.getInt(7));
-            //skad wziac lecturerID
->>>>>>> b065ddadb9ae48f8de51c90b5b263e62b88bec92
+
+            res.close();
         }
-        res.close();
         return classes;
     }
 
-    public int checkDBVersion() {
+    public void checkDBVersion(final MainActivity activity) {
         RequestManager.sendRequest(Request.Method.GET,URL + "/versions", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -238,6 +252,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     JSONArray array = new JSONArray(response);
                     JSONObject versionObject = array.getJSONObject(0);
                     version = Integer.parseInt(versionObject.getString("ver"));
+                    activity.setVersion(version);
                     Toast.makeText(context, "Wersja bazy budynków " + version, Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     version = -1;
@@ -247,11 +262,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                version = -1;
+                activity.setVersion(-1);
                 Toast.makeText(context, "Błąd podczas pobierania wersji bazy", Toast.LENGTH_SHORT).show();
             }
         });
-        return version;
     }
 
 }

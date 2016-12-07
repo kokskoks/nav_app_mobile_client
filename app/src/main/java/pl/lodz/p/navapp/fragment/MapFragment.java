@@ -10,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,6 +28,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -71,6 +73,7 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
     private boolean fromCurrentLocation = true;
     private List<String> namesList;
     private DatabaseHelper db;
+    PlaceInfo placeInfo;
 
     private static MapFragment instance = null;
 
@@ -99,8 +102,7 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(getResources().getDrawable(R.drawable.marker_red));
         InfoWindow infoWindow = new MyInfoWindow(R.layout.bubble, mMapView);
-        marker.setTitle(place.getTitle());
-        marker.setSubDescription(place.getDescription());
+
         marker.setInfoWindow(infoWindow);
         if (buildingInfoMarker) {
             mMapView.getOverlays().clear();
@@ -156,7 +158,7 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String title = (String) adapterView.getItemAtPosition(i);
-                PlaceInfo placeInfo = db.getPlace(title.trim());
+                placeInfo = db.getPlace(title.trim());
                 addMarker(placeInfo, true);
                 if (view != null) {
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -290,18 +292,17 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
 
         @Override
         public void onOpen(Object arg0) {
-            LinearLayout layout = (LinearLayout) mView.findViewById(R.id.bubble_layout);
+            ImageView infoImage =  (ImageView) mView.findViewById(R.id.bubble_image);
             Button btnMoreInfo = (Button) mView.findViewById(R.id.goToInternet);
             TextView txtTitle = (TextView) mView.findViewById(R.id.bubble_title);
             TextView txtDescription = (TextView) mView.findViewById(R.id.bubble_description);
-            TextView txtSubdescription = (TextView) mView.findViewById(R.id.bubble_subdescription);
 
-            txtTitle.setText("Title of my marker");
-            txtDescription.setText("Click here to view details!");
-            txtSubdescription.setText("You can also edit the subdescription");
+            txtTitle.setText(placeInfo.getTitle());
+            txtDescription.setText(placeInfo.getAddress());
+            //infoImage.setBackground(getResources().getDrawable());
             btnMoreInfo.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    openWebURL("http://www.onet.pl");
+                    openWebURL(placeInfo.getDescription());
                 }
             });
         }
