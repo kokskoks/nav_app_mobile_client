@@ -219,14 +219,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             classes.setStartHour(res.getInt(5));
             classes.setEndHour(res.getInt(6));
             classes.setWeekday(res.getInt(7));
-            //skad wziac recturerID
+            //skad wziac lecturerID
         }
         res.close();
         return classes;
     }
 
     public int checkDBVersion() {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL + "/versions", new Response.Listener<String>() {
+        RequestManager.sendRequest(Request.Method.GET,URL + "/versions", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -245,18 +245,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 version = -1;
                 Toast.makeText(context, "Błąd podczas pobierania wersji bazy", Toast.LENGTH_SHORT).show();
             }
-        }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> params = new HashMap<>();
-                String creds = String.format("%s:%s", "user", "user");
-                String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
-                params.put("Authorization", auth);
-                return params;
-            }
-        };
-        NavAppApplication.getInstance().addToRequestQueue(stringRequest);
+        });
         return version;
     }
 
