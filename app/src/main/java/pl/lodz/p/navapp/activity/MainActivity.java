@@ -17,8 +17,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,16 +24,11 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import pl.lodz.p.navapp.NavAppApplication;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.domain.PlaceInfo;
@@ -77,8 +69,14 @@ public class MainActivity extends AppCompatActivity
     private List<PlaceInfo> placeInfos;
     private AutoCompleteTextView autocompleteLocation;
     private List<String> names;
-    private int version;
+    private int version=NO_INTERNET_ACCESS;
     private Fragment lastAddedFragment;
+
+    public int getVersion() {
+        return version;
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,9 +107,9 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         autocompleteLocation = (AutoCompleteTextView) findViewById(R.id.mySearchView);
-        names.add("CH Sukcesja");
+        //names.add("CH Sukcesja");
         //test placeinfo
-        PlaceInfo placeInfo = new PlaceInfo();
+/*        PlaceInfo placeInfo = new PlaceInfo();
         placeInfo.setID(1);
         placeInfo.setTitle("CH Sukcesja");
         placeInfo.setAddress("Politechniki 1");
@@ -128,18 +126,19 @@ public class MainActivity extends AppCompatActivity
         placeInfo.setSublocations(sublocations);
         cordinatesDB.insertPlace(placeInfo);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplication(), R.layout.my_list_layout, names);
-        autocompleteLocation.setAdapter(adapter);
+        autocompleteLocation.setAdapter(adapter);*/
         //test placeinfo
 
-          checkDatabaseVersion();
+         //checkDatabaseVersion();
+        getBuildings();
     }
 
     private void checkDatabaseVersion() {
-        version = cordinatesDB.checkDBVersion();
+        cordinatesDB.checkDBVersion(this);
         if (version != NO_INTERNET_ACCESS) {
             int localVersion = readFromFile(this);
             if (localVersion == FILE_READ_ERROR || version != localVersion) {
-                getTimetableInfo();
+                getBuildings();
             } else {
                 populateFromDatabase();
             }
@@ -196,7 +195,7 @@ public class MainActivity extends AppCompatActivity
         autocompleteLocation.setAdapter(adapter);
     }
 
-    private void getTimetableInfo() {
+    private void getBuildings() {
         RequestManager.sendRequest(Request.Method.GET, URL + "/buildings", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -388,5 +387,9 @@ public class MainActivity extends AppCompatActivity
 
     public DatabaseHelper getCordinatesDB() {
         return cordinatesDB;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 }
