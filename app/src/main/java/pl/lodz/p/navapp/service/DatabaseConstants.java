@@ -6,6 +6,7 @@ package pl.lodz.p.navapp.service;
 
 public class DatabaseConstants {
     public static final String DATABASE_NAME = "navAppDB.db";
+    static final String DROP = "DROP TABLE IF EXISTS ";
     //Coordinates table
      static final String TABLE_COORDINATES = "COORDINATES";
      static final String COORDINATES_COLUMN_ID = "COORD_ID";
@@ -86,7 +87,7 @@ public class DatabaseConstants {
             + LECTURERS_COLUMN_ID + " INTEGER PRIMARY KEY, "
             + LECTURERS_COLUMN_FIRSTNAME + " TEXT, "
             + LECTURERS_COLUMN_LASTNAME + " TEXT, "
-            + LECTURERS_COLUMN_TITLE + " TEXT) "
+            + LECTURERS_COLUMN_TITLE + " TEXT, "
             + LECTURERS_COLUMN_DESCRIPTION + " TEXT, "
             + LECTURERS_COLUMN_MAIL + " TEXT) ";
 
@@ -104,13 +105,14 @@ public class DatabaseConstants {
             + CLASS_LECTURER_ID + " INTEGER, FOREIGN KEY ("
             + CLASS_LECTURER_ID + ") REFERENCES " + TABLE_LECTURERS + "(" + LECTURERS_COLUMN_ID + "))";
 
-    static final String DROP_CLASS_TABLE = "DROP TABLE IF EXISTS" + TABLE_CLASS;
 
-    static final String DROP_LECTURERS_TABLE = "DROP TABLE IF EXISTS" + TABLE_LECTURERS;
+    static final String DROP_CLASS_TABLE = DROP + TABLE_CLASS;
 
-    static final String DROP_COORDINATES_TABLE = "DROP TABLE IF EXISTS" + TABLE_COORDINATES;
+    static final String DROP_LECTURERS_TABLE = DROP + TABLE_LECTURERS;
 
-    static final String DROP_SUBLOCATIONS_TABLE = "DROP TABLE IF EXISTS" + TABLE_SUBLOCATIONS;
+    static final String DROP_COORDINATES_TABLE = DROP + TABLE_COORDINATES;
+
+    static final String DROP_SUBLOCATIONS_TABLE = DROP + TABLE_SUBLOCATIONS;
 
     private DatabaseConstants() {
 

@@ -3,7 +3,7 @@ package pl.lodz.p.navapp.domain;
 /**
  * Created by Calgon on 2016-12-06.
  */
-public class Lecture {
+public class Lecturer {
 
     private int ID;
     private String firstName;
@@ -62,7 +62,7 @@ public class Lecture {
 
     @Override
     public String toString() {
-        return "Lecture{" +
+        return "Lecturer{" +
                 "ID=" + ID +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
@@ -72,10 +72,10 @@ public class Lecture {
                 '}';
     }
 
-    public Lecture() {
+    public Lecturer() {
     }
 
-    public Lecture(int ID, String firstName, String lastName, String title, String description, String mail) {
+    public Lecturer(int ID, String firstName, String lastName, String title, String description, String mail) {
         this.ID = ID;
         this.firstName = firstName;
         this.lastName = lastName;
