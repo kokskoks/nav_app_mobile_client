@@ -11,6 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +22,15 @@ import pl.lodz.p.navapp.domain.ClassInfo;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.RVAdapter;
+import pl.lodz.p.navapp.service.RequestManager;
+
+import static pl.lodz.p.navapp.ApplicationConstants.URL;
 
 public class TimetableFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    private int groupID;
+    private List<ClassInfo> classInfos;
 
     public TimetableFragment() {
     }
@@ -29,7 +38,7 @@ public class TimetableFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        this.classInfos = new ArrayList<>();
         setRetainInstance(true);
     }
 
@@ -37,12 +46,23 @@ public class TimetableFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
+        this.groupID = getArguments().getInt("groupID");
         AutoCompleteTextView autocompleteLocation = (AutoCompleteTextView) getActivity().findViewById(R.id.mySearchView);
         autocompleteLocation.setAdapter(null);
         RecyclerView rv = (RecyclerView)view.findViewById(R.id.group_recycler_view);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),1);
         rv.setLayoutManager(gridLayoutManager);
-        List<ClassInfo> classInfos = new ArrayList<>();
+        RequestManager.sendRequest(Request.Method.GET, URL + "/university-groups/"+String.valueOf(this.groupID), new Response.Listener() {
+            @Override
+            public void onResponse(Object response) {
+                //CALGON TU WSTAW TRANSFORMACJE
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
         ClassInfo przyrka = new ClassInfo("Pszyrka","Akwarium","8:00","10:00");
         ClassInfo religia = new ClassInfo("Religia","Akwarium","10:00","12:00");
         ClassInfo wychowanie = new ClassInfo("Wychowanie do życia w rodzinie","Akwarium","12:00","14:00");

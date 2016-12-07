@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -335,11 +336,15 @@ public class MainActivity extends AppCompatActivity
     private void initDialog(final Dialog dialog) {
         dialog.setContentView(R.layout.group_choser_dialog);
         Button ok = (Button) dialog.findViewById(R.id.groupConfirmButton);
+        final Spinner groupSpinner = (Spinner) dialog.findViewById(R.id.group_spinner);
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
                 TimetableFragment timetableFragment = new TimetableFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("groupID",groupSpinner.getId());
+                timetableFragment.setArguments(bundle);
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_container, timetableFragment);
                 fragmentTransaction.commit();
