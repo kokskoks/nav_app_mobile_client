@@ -55,6 +55,12 @@ public class DatabaseConstants {
      static final String LECTURERS_COLUMN_DESCRIPTION = "LECTURERS_DESCRIPTION";
      static final String LECTURERS_COLUMN_MAIL = "LECTURERS_MAIL";
 
+    static final String TABLE_CLASSROOM = "CLASSROOM";
+    static final String CLASSROM_COLUMN_ID = "CLASSROOM_ID";
+    static final String CLASSROOM_COLUMN_NAME = "CLASSROOM_NAME";
+    static final String CLASSROOM_COLUMN_DESCRIPTION = "CLASSROOM_DESCRIPTION";
+    static final String CLASSROOM_COLUMN_FLOOR = "CLASSROOM_FLOOR";
+
     static final String TABLE_WEEKS_CREATE_QUERY = "create table "
             + TABLE_WEEKS + "("
             + WEEK_COLUMN_ID + " INTEGER PRIMARY KEY, "
