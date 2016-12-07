@@ -49,6 +49,7 @@ import pl.lodz.p.navapp.NavAppApplication;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.domain.Classes;
+import pl.lodz.p.navapp.domain.Classroom;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
 import pl.lodz.p.navapp.fragment.MapFragment;
@@ -246,6 +247,22 @@ public class MainActivity extends AppCompatActivity
             classesList.add(classes);
         }
     }
+
+    private List<Classroom> classroomList;
+    private void translateResponeClassroom(String response) throws JSONException {
+        JSONArray array = new JSONArray(response);
+        for (int i = 0; i < array.length(); i++) {
+            Classroom classroom = new Classroom();
+            JSONObject object = (JSONObject) array.get(i);
+            classroom.setID(Integer.parseInt(object.getString("id")));
+            classroom.setName(object.getString("name").trim());
+            classroom.setDescription(object.getString("description").trim());
+            classroom.setFloor(Integer.parseInt(object.getString("floor").trim()));
+            classroomList.add(classroom);
+        }
+    }
+
+    
 
 
 
