@@ -8,6 +8,7 @@ public class Classroom {
     private String name;
     private String description;
     private int floor;
+    private PlaceInfo building;
 
     public Classroom() {
     }
@@ -59,5 +60,13 @@ public class Classroom {
                 ", description='" + description + '\'' +
                 ", floor=" + floor +
                 '}';
+    }
+
+    public PlaceInfo getBuilding() {
+        return building;
+    }
+
+    public void setBuilding(PlaceInfo building) {
+        this.building = building;
     }
 }

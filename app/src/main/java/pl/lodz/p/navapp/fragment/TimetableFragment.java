@@ -15,6 +15,11 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.osmdroid.util.GeoPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +27,12 @@ import pl.lodz.p.navapp.domain.ClassInfo;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.RVAdapter;
+import pl.lodz.p.navapp.domain.Classes;
+import pl.lodz.p.navapp.domain.Classroom;
+import pl.lodz.p.navapp.domain.Group;
+import pl.lodz.p.navapp.domain.Lecturer;
+import pl.lodz.p.navapp.domain.PlaceInfo;
+import pl.lodz.p.navapp.domain.Sublocation;
 import pl.lodz.p.navapp.service.RequestManager;
 
 import static pl.lodz.p.navapp.ApplicationConstants.URL;
@@ -52,10 +63,14 @@ public class TimetableFragment extends Fragment {
         RecyclerView rv = (RecyclerView)view.findViewById(R.id.group_recycler_view);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),1);
         rv.setLayoutManager(gridLayoutManager);
-        RequestManager.sendRequest(Request.Method.GET, URL + "/university-groups/"+String.valueOf(this.groupID), new Response.Listener() {
+        RequestManager.sendRequest(Request.Method.GET, URL + "/university-groups/"+String.valueOf(this.groupID), new Response.Listener<String>() {
             @Override
-            public void onResponse(Object response) {
-                //CALGON TU WSTAW TRANSFORMACJE
+            public void onResponse(String response) {
+                try {
+                    translateResponeGroup(response);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -72,6 +87,85 @@ public class TimetableFragment extends Fragment {
         RVAdapter adapter = new RVAdapter(classInfos);
         rv.setAdapter(adapter);
         return view;
+    }
+
+    private void translateResponeGroup(String response) throws JSONException {
+        JSONArray array = new JSONArray(response);
+         List<Group> groupList = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            Group group = new Group();
+            JSONObject object = (JSONObject) array.get(i);
+            group.setID(Integer.parseInt(object.getString("id")));
+            group.setSubject(object.getString("subject").trim());
+            group.setCode(object.getString("code").trim());
+            group.setDescription(object.getString("description").trim());
+            group.setSemester(object.getString("semester").trim());
+            group.setSpecialisation(object.getString("specialisation").trim());
+            group.toString();
+
+            JSONArray subClasses = object.getJSONArray("classes");
+            List<Classes> classesList = new ArrayList<>();
+            for (int j = 0; j < subClasses.length(); j++) {
+                JSONObject responseSubclasses = (JSONObject) subClasses.get(j);
+                Classes classes = new Classes();
+                classes.setID(Integer.parseInt(responseSubclasses.getString("id")));
+                classes.setName(responseSubclasses.getString("name").trim());
+                classes.setModuleCode(responseSubclasses.getString("moduleCode").trim());
+                classes.setDescription(responseSubclasses.getString("description").trim());
+                classes.setType(responseSubclasses.getString("type").trim());
+                classes.setStartHour(Integer.parseInt(responseSubclasses.getString("startHour").trim()));
+                classes.setEndHour(Integer.parseInt(responseSubclasses.getString("endHour").trim()));
+                classes.setWeekday(responseSubclasses.getString("weekDay").trim());
+                classes.toString();
+                classesList.add(classes);
+            }
+            group.setClassesList(classesList);
+
+            /////dodac WEEKS !
+
+            JSONArray subLecturer = object.getJSONArray("lecturers");
+            List<Lecturer> lecturerList=new ArrayList<>();
+            for (int j = 0; j < subLecturer.length(); j++) {
+                JSONObject responseLecturer = (JSONObject) subLecturer.get(j);
+                Lecturer lecturer = new Lecturer();
+                lecturer.setID(Integer.parseInt(responseLecturer.getString("id")));
+                lecturer.setFirstName(responseLecturer.getString("firstName").trim());
+                lecturer.setLastName(responseLecturer.getString("lastName").trim());
+                lecturer.setTitle(responseLecturer.getString("title").trim());
+                lecturer.setDescription(responseLecturer.getString("description").trim());
+                lecturer.setMail(responseLecturer.getString("mail").trim());
+                lecturer.toString();
+                lecturerList.add(lecturer);
+            }
+            group.setLecturerList(lecturerList);
+
+
+            JSONObject subClassroom = object.getJSONObject("classroom");
+            Classroom classroom = new Classroom();
+            classroom.setID(Integer.parseInt(subClassroom.getString("id")));
+            classroom.setName(subClassroom.getString("name").trim());
+            classroom.setDescription(subClassroom.getString("description").trim());
+            classroom.setFloor(Integer.parseInt(subClassroom.getString("floor").trim()));
+            classroom.toString();
+            group.setClassroom(classroom);
+
+            JSONObject buildings = subClassroom.getJSONObject("building");
+            PlaceInfo placeInfo = new PlaceInfo();
+            placeInfo.setID(Integer.parseInt(buildings.getString("id")));
+            placeInfo.setTitle(buildings.getString("name").trim());
+            placeInfo.setPlaceNumber(buildings.getString("code").trim());
+            placeInfo.setDescription(buildings.getString("description").trim());
+            placeInfo.setAddress(buildings.getString("street").trim());
+            if (!"null".equalsIgnoreCase(buildings.getString("longitude"))) {
+                double lon = Double.valueOf(buildings.getString("longitude"));
+                double lat = Double.valueOf(buildings.getString("latitude"));
+                GeoPoint geoPoint = new GeoPoint(lat, lon);
+                placeInfo.setGeoPoint(geoPoint);
+            }
+            classroom.setBuilding(placeInfo);
+            groupList.add(group);
+        }
+        //glowny for
     }
 
     public void onButtonPressed(Uri uri) {
