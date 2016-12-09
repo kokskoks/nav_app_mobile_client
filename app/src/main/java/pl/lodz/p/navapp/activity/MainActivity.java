@@ -3,9 +3,11 @@ package pl.lodz.p.navapp.activity;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -47,40 +49,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import pl.lodz.p.navapp.utility.ApplicationConstants;
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.R;
-import pl.lodz.p.navapp.domain.Classes;
-import pl.lodz.p.navapp.domain.Classroom;
-import pl.lodz.p.navapp.domain.Group;
-import pl.lodz.p.navapp.domain.Lecturer;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
 import pl.lodz.p.navapp.fragment.MapFragment;
 import pl.lodz.p.navapp.fragment.TimetableFragment;
 import pl.lodz.p.navapp.service.DatabaseHelper;
 import pl.lodz.p.navapp.service.RequestManager;
+import pl.lodz.p.navapp.utility.FileUtils;
 
-import static pl.lodz.p.navapp.ApplicationConstants.FILE_READ_ERROR;
-import static pl.lodz.p.navapp.ApplicationConstants.NO_INTERNET_ACCESS;
-import static pl.lodz.p.navapp.ApplicationConstants.URL;
-import static pl.lodz.p.navapp.ApplicationConstants.VERSION_FILE_NAME;
+import static pl.lodz.p.navapp.utility.ApplicationConstants.FILE_READ_ERROR;
+import static pl.lodz.p.navapp.utility.ApplicationConstants.NO_INTERNET_ACCESS;
+import static pl.lodz.p.navapp.utility.ApplicationConstants.URL;
+import static pl.lodz.p.navapp.utility.ApplicationConstants.VERSION_FILE_NAME;
 import static pl.lodz.p.navapp.service.DatabaseConstants.DATABASE_NAME;
+import static pl.lodz.p.navapp.utility.FileUtils.readFromFile;
+import static pl.lodz.p.navapp.utility.FileUtils.writeVersionToFile;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
 
     private static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
+    private int version = NO_INTERNET_ACCESS;
     private DatabaseHelper cordinatesDB;
     private List<PlaceInfo> placeInfos;
     private AutoCompleteTextView autocompleteLocation;
     private List<String> names;
-    private int version=NO_INTERNET_ACCESS;
+
     private Fragment lastAddedFragment;
-
-    public int getVersion() {
-        return version;
-    }
-
+    private Map<String, Integer> groupNames;
 
 
     @Override
@@ -94,6 +93,7 @@ public class MainActivity extends AppCompatActivity
         }
         placeInfos = new ArrayList<>();
         names = new ArrayList<>();
+        groupNames = new HashMap<>();
         if (savedInstanceState == null) {
             MapFragment mapFragment = MapFragment.getInstance();
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -112,29 +112,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         autocompleteLocation = (AutoCompleteTextView) findViewById(R.id.mySearchView);
-        //names.add("CH Sukcesja");
-        //test placeinfo
-/*        PlaceInfo placeInfo = new PlaceInfo();
-        placeInfo.setID(1);
-        placeInfo.setTitle("CH Sukcesja");
-        placeInfo.setAddress("Politechniki 1");
-        placeInfo.setPlaceNumber("W6");
-        GeoPoint geoPoint = new GeoPoint(51.750647,19.449435);
-        placeInfo.setGeoPoint(geoPoint);
-        placeInfo.setDescription("http://sukcesja.eu/");
-        Sublocation sublocation = new Sublocation();
-        sublocation.setId(2);
-        sublocation.setName("CH Sukcesja");
-        sublocation.setCode("204");
-        List<Sublocation> sublocations = new ArrayList<>();
-        sublocations.add(sublocation);
-        placeInfo.setSublocations(sublocations);
-        cordinatesDB.insertPlace(placeInfo);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplication(), R.layout.my_list_layout, names);
-        autocompleteLocation.setAdapter(adapter);*/
-        //test placeinfo
-
-         //checkDatabaseVersion();
+        //checkDatabaseVersion();
         getBuildings();
     }
 
@@ -152,48 +130,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void writeVersionToFile(int data, Context context) {
-        try {
-            String version = String.valueOf(data);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(VERSION_FILE_NAME, Context.MODE_PRIVATE));
-            outputStreamWriter.write(version);
-            outputStreamWriter.close();
-        } catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
-    }
-
-    private int readFromFile(Context context) {
-
-        String ret = "";
-
-        try {
-            InputStream inputStream = context.openFileInput(VERSION_FILE_NAME);
-
-            if (inputStream != null) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ((receiveString = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(receiveString);
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
-            }
-        } catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-            return FILE_READ_ERROR;
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
-            return FILE_READ_ERROR;
-        }
-
-        return Integer.parseInt(ret);
-    }
-
     private void populateFromDatabase() {
         this.names = cordinatesDB.getPlacesNames();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplication(), R.layout.my_list_layout, names);
@@ -204,17 +140,7 @@ public class MainActivity extends AppCompatActivity
         RequestManager.sendRequest(Request.Method.GET, URL + "/buildings", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                try {
-                    translateResponsePlaceInfo(response);
-                    insertToDatabase();
-                    names = cordinatesDB.getPlacesNames();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplication(), R.layout.my_list_layout, names);
-                    autocompleteLocation.setAdapter(adapter);
-                    writeVersionToFile(version, getApplicationContext());
-                    Toast.makeText(getApplicationContext(), "Pomyślnie sparsowano", Toast.LENGTH_SHORT).show();
-                } catch (JSONException e) {
-                    Toast.makeText(getApplicationContext(), "Błąd podczas parsowania danych", Toast.LENGTH_SHORT).show();
-                }
+                new TransformOperation().execute(response);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -224,89 +150,7 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void insertToDatabase() {
-        for (int i = 0; i < placeInfos.size(); i++) {
-            cordinatesDB.insertPlace(placeInfos.get(i));
-        }
-    }
-    
-    private void translateResponsePlaceInfo(String response) throws JSONException {
-        JSONArray array = new JSONArray(response);
-        for (int i = 0; i < array.length(); i++) {
-            PlaceInfo placeInfo = new PlaceInfo();
-            JSONObject object = (JSONObject) array.get(i);
-            placeInfo.setID(Integer.parseInt(object.getString("id")));
-            placeInfo.setTitle(object.getString("name").trim());
-            placeInfo.setPlaceNumber(object.getString("code").trim());
-            placeInfo.setDescription(object.getString("description").trim());
-            placeInfo.setAddress(object.getString("street").trim());
-            if (!"null".equalsIgnoreCase(object.getString("longitude"))) {
-                double lon = Double.valueOf(object.getString("longitude"));
-                double lat = Double.valueOf(object.getString("latitude"));
-                GeoPoint geoPoint = new GeoPoint(lat, lon);
-                placeInfo.setGeoPoint(geoPoint);
-            }
-            JSONArray subLocations = object.getJSONArray("sublocations");
-            List<Sublocation> sublocationList = placeInfo.getSublocations();
-            for (int j = 0; j < subLocations.length(); j++) {
-                JSONObject responseSublocation = (JSONObject) subLocations.get(j);
-                Sublocation sublocation = new Sublocation();
-                sublocation.setId(Integer.parseInt(responseSublocation.getString("id")));
-                sublocation.setName(responseSublocation.getString("name").trim());
-                sublocation.setCode(responseSublocation.getString("code").trim());
-                sublocation.setPlaceID(placeInfo.getID());
-                sublocationList.add(sublocation);
-            }
-            placeInfos.add(placeInfo);
-        }
-    }
-  //  private List<Lecturer> lecturerList;
-//    private void translateResponeLecturer(String response) throws JSONException {
-//        JSONArray array = new JSONArray(response);
-//        for (int i = 0; i < array.length(); i++) {
-//            Lecturer lecturer = new Lecturer();
-//            JSONObject object = (JSONObject) array.get(i);
-//            lecturer.setID(Integer.parseInt(object.getString("id")));
-//            lecturer.setFirstName(object.getString("firstName").trim());
-//            lecturer.setLastName(object.getString("lastName").trim());
-//            lecturer.setTitle(object.getString("title").trim());
-//            lecturer.setDescription(object.getString("description").trim());
-//            lecturer.setMail(object.getString("mail").trim());
-//            lecturerList.add(lecturer);
-//        }
-//    }
 
- //   private List<Classroom> classroomList;
-//    private void translateResponeClassroom(String response) throws JSONException {
-//        JSONArray array = new JSONArray(response);
-//        for (int i = 0; i < array.length(); i++) {
-//            Classroom classroom = new Classroom();
-//            JSONObject object = (JSONObject) array.get(i);
-//            classroom.setID(Integer.parseInt(object.getString("id")));
-//            classroom.setName(object.getString("name").trim());
-//            classroom.setDescription(object.getString("description").trim());
-//            classroom.setFloor(Integer.parseInt(object.getString("floor").trim()));
-//            classroomList.add(classroom);
-//        }
-//    }
-
-
-  //  private void translateResponeClasses(String response) throws JSONException {
-//        JSONArray array = new JSONArray(response);
-//        for (int i = 0; i < array.length(); i++) {
-//            Classes classes = new Classes();
-//            JSONObject object = (JSONObject) array.get(i);
-//            classes.setID(Integer.parseInt(object.getString("id")));
-//            classes.setName(object.getString("name").trim());
-//            classes.setModuleCode(object.getString("moduleCode").trim());
-//            classes.setDescription(object.getString("description").trim());
-//            classes.setType(object.getString("type").trim());
-//            classes.setStartHour(Integer.parseInt(object.getString("startHour").trim()));
-//            classes.setEndHour(Integer.parseInt(object.getString("endHour").trim()));
-//            classes.setWeekday(object.getString("weekDay").trim());
-//            classesList.add(classes);
-//        }
-//    }
 
     @Override
     public void onBackPressed() {
@@ -330,17 +174,33 @@ public class MainActivity extends AppCompatActivity
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
 
     }
+
     private void initDialog(final Dialog dialog) {
         dialog.setContentView(R.layout.group_choser_dialog);
         Button ok = (Button) dialog.findViewById(R.id.groupConfirmButton);
         final Spinner groupSpinner = (Spinner) dialog.findViewById(R.id.group_spinner);
+        RequestManager.sendRequest(Request.Method.GET, ApplicationConstants.URL + "/university-groups", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                List<String> spinnerList = translateGroups(response);
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, spinnerList);
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                groupSpinner.setAdapter(dataAdapter);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
                 TimetableFragment timetableFragment = new TimetableFragment();
                 Bundle bundle = new Bundle();
-                bundle.putInt("groupID",groupSpinner.getId());
+                int groupID = groupNames.get(groupSpinner.getSelectedItem().toString());
+                bundle.putInt("groupID", groupID);
                 timetableFragment.setArguments(bundle);
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_container, timetableFragment);
@@ -357,6 +217,22 @@ public class MainActivity extends AppCompatActivity
         });
         dialog.show();
     }
+
+    private List<String> translateGroups(String response) {
+        List<String> spinner = new ArrayList<>();
+        try {
+            JSONArray groups = new JSONArray(response);
+            for (int i = 0; i < groups.length(); i++) {
+                JSONObject group = (JSONObject) groups.get(i);
+                spinner.add(group.getString("code"));
+                groupNames.put(group.getString("code"), group.getInt("id"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return spinner;
+    }
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -369,7 +245,7 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction.commit();
             lastAddedFragment = mapFragment;
         } else if (id == R.id.nav_timetable) {
-            if(lastAddedFragment == null || lastAddedFragment instanceof MapFragment) {
+            if (lastAddedFragment == null || lastAddedFragment instanceof MapFragment) {
                 final Dialog dialog = new Dialog(this);
                 initDialog(dialog);
             }
@@ -446,5 +322,86 @@ public class MainActivity extends AppCompatActivity
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    private class TransformOperation extends AsyncTask<String, Void, String> {
+        private ProgressDialog dialog;
+
+        TransformOperation() {
+            this.dialog = new ProgressDialog(MainActivity.this);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                translateResponsePlaceInfo(params[0]);
+            } catch (JSONException e) {
+                Toast.makeText(getApplicationContext(), "Błąd podczas parsowania", Toast.LENGTH_SHORT).show();
+            }
+            insertToDatabase();
+            names = cordinatesDB.getPlacesNames();
+            writeVersionToFile(version, getApplicationContext());
+            return "Executed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplication(), R.layout.my_list_layout, names);
+            autocompleteLocation.setAdapter(adapter);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            Toast.makeText(getApplicationContext(), "Pomyślnie sparsowano", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.dialog.setMessage("Parsowanie danych");
+            this.dialog.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+        }
+        private void insertToDatabase() {
+            for (int i = 0; i < placeInfos.size(); i++) {
+                cordinatesDB.insertPlace(placeInfos.get(i));
+            }
+        }
+
+        private void translateResponsePlaceInfo(String response) throws JSONException {
+            JSONArray array = new JSONArray(response);
+            for (int i = 0; i < array.length(); i++) {
+                PlaceInfo placeInfo = new PlaceInfo();
+                JSONObject object = (JSONObject) array.get(i);
+                placeInfo.setID(Integer.parseInt(object.getString("id")));
+                placeInfo.setTitle(object.getString("name").trim());
+                placeInfo.setPlaceNumber(object.getString("code").trim());
+                placeInfo.setDescription(object.getString("description").trim());
+                placeInfo.setAddress(object.getString("street").trim());
+                if (!"null".equalsIgnoreCase(object.getString("longitude"))) {
+                    double lon = Double.valueOf(object.getString("longitude"));
+                    double lat = Double.valueOf(object.getString("latitude"));
+                    GeoPoint geoPoint = new GeoPoint(lat, lon);
+                    placeInfo.setGeoPoint(geoPoint);
+                }
+                JSONArray subLocations = object.getJSONArray("sublocations");
+                List<Sublocation> sublocationList = placeInfo.getSublocations();
+                for (int j = 0; j < subLocations.length(); j++) {
+                    JSONObject responseSublocation = (JSONObject) subLocations.get(j);
+                    Sublocation sublocation = new Sublocation();
+                    sublocation.setId(Integer.parseInt(responseSublocation.getString("id")));
+                    sublocation.setName(responseSublocation.getString("name").trim());
+                    sublocation.setCode(responseSublocation.getString("code").trim());
+                    sublocation.setPlaceID(placeInfo.getID());
+                    sublocationList.add(sublocation);
+                }
+                placeInfos.add(placeInfo);
+            }
+        }
     }
 }

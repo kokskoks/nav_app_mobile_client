@@ -1,4 +1,4 @@
-package pl.lodz.p.navapp;
+package pl.lodz.p.navapp.utility;
 
 import android.os.AsyncTask;
 
@@ -9,6 +9,7 @@ import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 
+import pl.lodz.p.navapp.R;
 import pl.lodz.p.navapp.domain.NavigationInfo;
 import pl.lodz.p.navapp.fragment.MapFragment;
 

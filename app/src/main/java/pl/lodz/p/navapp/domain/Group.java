@@ -13,7 +13,6 @@ public class Group {
     private String semester;
     private String specialisation;
     private List<Classes> classesList;
-    private List<Lecturer> lecturerList;
     private Classroom classroom;
 
     public Group() {
@@ -94,14 +93,6 @@ public class Group {
 
     public void setClassesList(List<Classes> classesList) {
         this.classesList = classesList;
-    }
-
-    public List<Lecturer> getLecturerList() {
-        return lecturerList;
-    }
-
-    public void setLecturerList(List<Lecturer> lecturerList) {
-        this.lecturerList = lecturerList;
     }
 
     public Classroom getClassroom() {

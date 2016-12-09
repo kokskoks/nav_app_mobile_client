@@ -25,7 +25,7 @@ import pl.lodz.p.navapp.domain.Lecturer;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.domain.Sublocation;
 
-import static pl.lodz.p.navapp.ApplicationConstants.URL;
+import static pl.lodz.p.navapp.utility.ApplicationConstants.URL;
 import static pl.lodz.p.navapp.service.DatabaseConstants.CLASS_COLUMN_ID;
 import static pl.lodz.p.navapp.service.DatabaseConstants.COORDINATES_COLUMN_ADDRESS;
 import static pl.lodz.p.navapp.service.DatabaseConstants.COORDINATES_COLUMN_DESCRIPTION;

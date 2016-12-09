@@ -1,5 +1,7 @@
 package pl.lodz.p.navapp.domain;
 
+import java.util.List;
+
 /**
  * Created by Calgon on 2016-12-06.
  */
@@ -14,6 +16,7 @@ public class Classes {
     private int endHour;
     private String weekday;
     private int lecturerID;
+    private List<Lecturer> lecturerList;
 
 
     public Classes(int ID, String name, String moduleCode, String description, String type, int startHour, int endHour, String weekday, int lecturerID) {
@@ -117,5 +120,13 @@ public class Classes {
                 ", weekday='" + weekday + '\'' +
                 ", lecturerID=" + lecturerID +
                 '}';
+    }
+
+    public List<Lecturer> getLecturerList() {
+        return lecturerList;
+    }
+
+    public void setLecturerList(List<Lecturer> lecturerList) {
+        this.lecturerList = lecturerList;
     }
 }

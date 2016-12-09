@@ -10,7 +10,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -29,7 +28,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -51,17 +49,18 @@ import java.util.Locale;
 
 import pl.lodz.p.navapp.OnFragmentInteractionListener;
 import pl.lodz.p.navapp.R;
-import pl.lodz.p.navapp.RouteFinder;
 import pl.lodz.p.navapp.activity.MainActivity;
 import pl.lodz.p.navapp.domain.NavigationInfo;
 import pl.lodz.p.navapp.domain.PlaceInfo;
 import pl.lodz.p.navapp.service.DatabaseHelper;
+import pl.lodz.p.navapp.utility.ApplicationConstants;
+import pl.lodz.p.navapp.utility.RouteFinder;
 
-import static pl.lodz.p.navapp.ApplicationConstants.MAX_ZOOM_LEVEL;
-import static pl.lodz.p.navapp.ApplicationConstants.TravelType.BIKE;
-import static pl.lodz.p.navapp.ApplicationConstants.TravelType.CAR;
-import static pl.lodz.p.navapp.ApplicationConstants.TravelType.PEDESTRIAN;
-import static pl.lodz.p.navapp.ApplicationConstants.ZOOMLEVEL;
+import static pl.lodz.p.navapp.utility.ApplicationConstants.MAX_ZOOM_LEVEL;
+import static pl.lodz.p.navapp.utility.ApplicationConstants.TravelType.BIKE;
+import static pl.lodz.p.navapp.utility.ApplicationConstants.TravelType.CAR;
+import static pl.lodz.p.navapp.utility.ApplicationConstants.TravelType.PEDESTRIAN;
+import static pl.lodz.p.navapp.utility.ApplicationConstants.ZOOMLEVEL;
 
 public class MapFragment extends Fragment implements LocationListener, MapEventsReceiver {
     private MapView mMapView;
@@ -306,7 +305,7 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
             txtTitle.setText(this.info.getTitle());
             txtDescription.setText(this.info.getAddress());
 
-            int resourceId = getImageFromRes(this.info);
+            int resourceId = ApplicationConstants.getImageFromRes(this.info);
             infoImage.setBackground(getContext().getResources().getDrawable(resourceId));
 
             btnMoreInfo.setOnClickListener(new View.OnClickListener() {
@@ -317,105 +316,7 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
         }
     }
 
-    private int getImageFromRes(PlaceInfo info) {
-        int resourceId;
-        String place = info.getPlaceNumber();
 
-/*        if(place.equals("A1") || place.equals("A6") || place.equals("B5"))
-            resourceId = R.drawable.ipos2;
-        else if(place.equals("A2") || place.equals("A8") || place.equals("A9") || place.equals("A24") || place.equals("A26") || place.equals("C1") || place.equals("C2") || place.equals("C18"))
-            resourceId = R.drawable.chemiczny2;
-        else if(place.equals("A4"))
-            resourceId = R.drawable.binoz;
-        else if(place.equals("A5"))
-            resourceId = R.drawable.ck;
-        else if(place.equals("A10"))
-            resourceId = R.drawable.weeia;
-        else if(place.equals("A11") || place.equals("A12") || place.equals("C6") || place.equals("C7"))
-            resourceId = R.drawable.weeia2;
-        else if(place.equals("A13"))
-            resourceId = R.drawable.rekrutacja;
-        else if(place.equals("A16"))
-            resourceId = R.drawable.ife;
-        else if(place.equals("A18"))
-            resourceId = R.drawable.fabryka;
-        else if(place.equals("A20") || place.equals("A21") || place.equals("A31"))
-            resourceId = R.drawable.mechaniczny2;
-        else if(place.equals("A22"))
-            resourceId = R.drawable.mechaniczny;
-        else if(place.equals("A27"))
-            resourceId = R.drawable.chemiczny;
-        else if(place.equals("A33"))
-            resourceId = R.drawable.tmiwt;
-        else if(place.equals("B1"))
-            resourceId = R.drawable.rektorat;
-        else if(place.equals("B4"))
-            resourceId = R.drawable.ipos;
-        else if(place.equals("B6"))
-            resourceId = R.drawable.bais2;
-        else if(place.equals("B7"))
-            resourceId = R.drawable.bais;
-        else if(place.equals("B9"))
-            resourceId = R.drawable.lodex;
-        else if(place.equals("C4"))
-            resourceId = R.drawable.cs;
-        else if(place.equals("C5"))
-            resourceId = R.drawable.d6;
-        else if(place.equals("C9"))
-            resourceId = R.drawable.d7;
-        else if(place.equals("C11"))
-            resourceId = R.drawable.d4;
-        else if(place.equals("C12"))
-            resourceId = R.drawable.d3;
-        else if(place.equals("C13"))
-            resourceId = R.drawable.d2;
-        else if(place.equals("C14"))
-            resourceId = R.drawable.d1;
-        else if(place.equals("C15"))
-            resourceId = R.drawable.stolowka;
-        else if(place.equals("C3"))
-            resourceId = R.drawable.akwarium;
-        else if(place.equals("C16"))
-            resourceId = R.drawable.d8;
-        else if(place.equals("D1")  || place.equals("D3") || place.equals("D4"))
-            resourceId = R.drawable.oiz;
-        else if(place.equals("E1"))
-            resourceId = R.drawable.d9;
-        else if(place.equals("W1"))
-            resourceId = R.drawable.artefakt;
-        else if(place.equals("W2"))
-            resourceId = R.drawable.cotton;
-        else if(place.equals("W3"))
-            resourceId = R.drawable.futurysta;
-        else if(place.equals("W4") || place.equals("W11"))
-            resourceId = R.drawable.pko;
-        else if(place.equals("W5"))
-            resourceId = R.drawable.azs;
-        else if(place.equals("W6"))
-            resourceId = R.drawable.sukcesja;
-        else if(place.equals("W7"))
-            resourceId = R.drawable.expo;
-        else if(place.equals("W8"))
-            resourceId = R.drawable.finestra;
-        else if(place.equals("W10"))
-            resourceId = R.drawable.brodway;
-        else if(place.equals("W12"))
-            resourceId = R.drawable.indeks;
-        else if(place.equals("W13"))
-            resourceId = R.drawable.zabka;
-        else if(place.equals("W14"))
-            resourceId = R.drawable.drukarniastudencka;
-        else if(place.equals("W15"))
-            resourceId = R.drawable.dino;
-        else if(place.equals("W18"))
-            resourceId = R.drawable.d5;
-        else
-        resourceId = R.drawable.pl;*/
-
-        resourceId = R.drawable.pl;
-
-        return resourceId;
-    }
 
     public void openWebURL(String inURL) {
         Intent browse = new Intent(Intent.ACTION_VIEW, Uri.parse(inURL));

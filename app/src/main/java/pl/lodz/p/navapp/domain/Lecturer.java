@@ -83,4 +83,8 @@ public class Lecturer {
         this.description = description;
         this.mail = mail;
     }
+
+    public String getFullName() {
+        return this.firstName + " " + this.lastName;
+    }
 }

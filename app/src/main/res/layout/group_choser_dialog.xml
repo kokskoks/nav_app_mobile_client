@@ -22,7 +22,8 @@
         android:layout_below="@+id/textView2"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/group_spinner" />
+        android:id="@+id/group_spinner"
+        android:textColor="#FF0000"  />
 
     <Button
         android:text="Anuluj"
