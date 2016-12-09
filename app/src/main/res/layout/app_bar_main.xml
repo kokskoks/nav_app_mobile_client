@@ -26,6 +26,7 @@
                 android:iconifiedByDefault="true"
                 android:maxLines="1"
                 android:inputType="text"/>
+
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

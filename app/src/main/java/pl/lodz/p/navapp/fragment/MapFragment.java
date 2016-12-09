@@ -12,7 +12,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.speech.RecognizerIntent;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
@@ -30,6 +30,9 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.github.clans.fab.FloatingActionButton;
 
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -56,6 +59,7 @@ import pl.lodz.p.navapp.service.DatabaseHelper;
 import pl.lodz.p.navapp.utility.ApplicationConstants;
 import pl.lodz.p.navapp.utility.RouteFinder;
 
+import static android.app.Activity.RESULT_OK;
 import static pl.lodz.p.navapp.utility.ApplicationConstants.MAX_ZOOM_LEVEL;
 import static pl.lodz.p.navapp.utility.ApplicationConstants.TravelType.BIKE;
 import static pl.lodz.p.navapp.utility.ApplicationConstants.TravelType.CAR;
@@ -63,6 +67,7 @@ import static pl.lodz.p.navapp.utility.ApplicationConstants.TravelType.PEDESTRIA
 import static pl.lodz.p.navapp.utility.ApplicationConstants.ZOOMLEVEL;
 
 public class MapFragment extends Fragment implements LocationListener, MapEventsReceiver {
+    private static final int SPEECH_REQUEST_CODE = 0;
     private MapView mMapView;
     private MapController mMapController;
     private LocationManager locationManager;
@@ -128,6 +133,23 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
+            List<String> results = data.getStringArrayListExtra(
+                    RecognizerIntent.EXTRA_RESULTS);
+            String spokenText = results.get(0);
+            placeInfo = db.getPlace(spokenText.trim());
+            if(placeInfo!=null){
+                addMarker(placeInfo, true);
+            }else{
+                Toast.makeText(getActivity(),"Nie znaleziono lokacji",Toast.LENGTH_SHORT).show();
+            }
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
@@ -151,13 +173,29 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
                 }
             }
         });
+
+        FloatingActionButton fabSearch = (FloatingActionButton) view.findViewById(R.id.fabSearch);
+        fabSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                startActivityForResult(intent, SPEECH_REQUEST_CODE);
+            }
+        });
+
         AutoCompleteTextView autocompleteLocation = (AutoCompleteTextView) getActivity().findViewById(R.id.mySearchView);
         autocompleteLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String title = (String) adapterView.getItemAtPosition(i);
                 placeInfo = db.getPlace(title.trim());
-                addMarker(placeInfo, true);
+                if(placeInfo!=null){
+                    addMarker(placeInfo, true);
+                }else{
+                    Toast.makeText(getActivity(),"Nie znaleziono lokacji",Toast.LENGTH_SHORT).show();
+                }
                 if (view != null) {
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -226,18 +264,22 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
                 String fromLocation = dialogFromLocation.getText().toString();
                 String toLocation = dialogToLocation.getText().toString();
                 to = db.getPlace(toLocation.trim());
-                if (currentLocation.isChecked()) {
-                    PlaceInfo currentPosition = findCurrentLocation();
-                    if (currentPosition != null) {
-                        fromCurrentLocation = true;
-                        from = currentPosition;
+                if(to !=null) {
+                    if (currentLocation.isChecked()) {
+                        PlaceInfo currentPosition = findCurrentLocation();
+                        if (currentPosition != null) {
+                            fromCurrentLocation = true;
+                            from = currentPosition;
+                        }
+                    } else {
+                        fromCurrentLocation = false;
+                        from = db.getPlace(fromLocation.trim());
                     }
-                } else {
-                    fromCurrentLocation = false;
-                    from = db.getPlace(fromLocation.trim());
-                }
-                if (from != null && to != null) {
-                    drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId());
+                    if (from != null && to != null) {
+                        drawPath(from.getGeoPoint(), to.getGeoPoint(), locationType.getCheckedRadioButtonId());
+                    }
+                }else{
+                    Toast.makeText(getActivity(),"Nie znaleziono lokacji",Toast.LENGTH_SHORT).show();
                 }
                 dialog.dismiss();
 

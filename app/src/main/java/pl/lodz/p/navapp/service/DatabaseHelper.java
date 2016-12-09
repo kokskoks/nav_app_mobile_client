@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -161,9 +162,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     public PlaceInfo getPlace(String placeName) {
+        Log.d("Miejsce",placeName);
         SQLiteDatabase db = this.getWritableDatabase();
         List<Sublocation> sublocations = new ArrayList<>();
-        Cursor res2 = db.rawQuery("SELECT * FROM " + TABLE_SUBLOCATIONS + " WHERE " + SUBLOCATIONS_COLUMN_NAME + "='" + placeName + "'", null);
+        Cursor res2 = db.rawQuery("SELECT * FROM " + TABLE_SUBLOCATIONS + " WHERE LOWER(" + SUBLOCATIONS_COLUMN_NAME + ") ='" + placeName + "'", null);
         while (res2.moveToNext()) {
             Sublocation sublocation = new Sublocation();
             sublocation.setId(res2.getInt(0));
@@ -172,21 +174,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             sublocation.setPlaceID(res2.getInt(3));
             sublocations.add(sublocation);
         }
-        PlaceInfo placeInfo = new PlaceInfo();
-        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_COORDINATES + " WHERE " + COORDINATES_COLUMN_ID + "=" + sublocations.get(0).getPlaceID(), null);
-        while (res.moveToNext()) {
-            placeInfo.setID(res.getInt(0));
-            placeInfo.setTitle(res.getString(1));
-            placeInfo.setPlaceNumber(res.getString(2));
-            placeInfo.setAddress(res.getString(3));
-            double lon = Double.valueOf(res.getString(4));
-            double lat = Double.valueOf(res.getString(5));
-            placeInfo.setGeoPoint(new GeoPoint(lat, lon));
-            placeInfo.setDescription(res.getString(6));
-            placeInfo.setSublocations(sublocations);
+        PlaceInfo placeInfo = null;
+        if(!sublocations.isEmpty()) {
+            placeInfo = new PlaceInfo();
+            Cursor res = db.rawQuery("SELECT * FROM " + TABLE_COORDINATES + " WHERE LOWER(" + COORDINATES_COLUMN_ID + ")=" + sublocations.get(0).getPlaceID(), null);
+            while (res.moveToNext()) {
+                placeInfo.setID(res.getInt(0));
+                placeInfo.setTitle(res.getString(1));
+                placeInfo.setPlaceNumber(res.getString(2));
+                placeInfo.setAddress(res.getString(3));
+                double lon = Double.valueOf(res.getString(4));
+                double lat = Double.valueOf(res.getString(5));
+                placeInfo.setGeoPoint(new GeoPoint(lat, lon));
+                placeInfo.setDescription(res.getString(6));
+                placeInfo.setSublocations(sublocations);
+            }
+            res.close();
         }
         res2.close();
-        res.close();
+
         return placeInfo;
     }
 

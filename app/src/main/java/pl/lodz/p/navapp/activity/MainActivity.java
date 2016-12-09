@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResponse(String response) {
                 List<String> spinnerList = translateGroups(response);
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, spinnerList);
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, spinnerList);
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 groupSpinner.setAdapter(dataAdapter);
             }
