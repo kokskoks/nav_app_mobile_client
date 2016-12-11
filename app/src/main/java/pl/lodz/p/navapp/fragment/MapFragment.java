@@ -142,7 +142,7 @@ public class MapFragment extends Fragment implements LocationListener, MapEvents
             if(placeInfo!=null){
                 addMarker(placeInfo, true);
             }else{
-                Toast.makeText(getActivity(),"Nie znaleziono lokacji",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"Nie znaleziono lokacji " + spokenText,Toast.LENGTH_SHORT).show();
             }
 
         }

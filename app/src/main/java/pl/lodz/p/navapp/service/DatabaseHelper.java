@@ -165,7 +165,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d("Miejsce",placeName);
         SQLiteDatabase db = this.getWritableDatabase();
         List<Sublocation> sublocations = new ArrayList<>();
-        Cursor res2 = db.rawQuery("SELECT * FROM " + TABLE_SUBLOCATIONS + " WHERE LOWER(" + SUBLOCATIONS_COLUMN_NAME + ") ='" + placeName + "'", null);
+        Cursor res2 = db.rawQuery("SELECT * FROM " + TABLE_SUBLOCATIONS + " WHERE " + SUBLOCATIONS_COLUMN_NAME + "='" + placeName + "' COLLATE NOCASE", null);
         while (res2.moveToNext()) {
             Sublocation sublocation = new Sublocation();
             sublocation.setId(res2.getInt(0));
@@ -177,7 +177,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         PlaceInfo placeInfo = null;
         if(!sublocations.isEmpty()) {
             placeInfo = new PlaceInfo();
-            Cursor res = db.rawQuery("SELECT * FROM " + TABLE_COORDINATES + " WHERE LOWER(" + COORDINATES_COLUMN_ID + ")=" + sublocations.get(0).getPlaceID(), null);
+            Cursor res = db.rawQuery("SELECT * FROM " + TABLE_COORDINATES + " WHERE " + COORDINATES_COLUMN_ID + "=" + sublocations.get(0).getPlaceID(), null);
             while (res.moveToNext()) {
                 placeInfo.setID(res.getInt(0));
                 placeInfo.setTitle(res.getString(1));

@@ -105,6 +105,7 @@ public class TimetableFragment extends Fragment {
             classes.setType(responseSubclasses.getString("type").trim());
             classes.setStartHour(Integer.parseInt(responseSubclasses.getString("startHour").trim()));
             classes.setEndHour(Integer.parseInt(responseSubclasses.getString("endHour").trim()));
+            classes.setWeekday(responseSubclasses.getString("weekday").trim());
             JSONArray subLecturer = responseSubclasses.getJSONArray("lecturers");
             List<Lecturer> lecturerList = new ArrayList<>();
             for (int j = 0; j < subLecturer.length(); j++) {

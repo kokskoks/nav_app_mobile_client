@@ -26,7 +26,8 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:maxLines="1"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:hint="Do"/>
 
     <RadioGroup
         android:layout_width="wrap_content"
@@ -91,7 +92,8 @@
         android:layout_toLeftOf="@+id/currentLocationCheckbox"
         android:layout_toStartOf="@+id/currentLocationCheckbox"
         android:maxLines="1"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:hint="Od"/>
 
 
 </RelativeLayout>

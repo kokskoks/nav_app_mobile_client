@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity
         autocompleteLocation = (AutoCompleteTextView) findViewById(R.id.mySearchView);
         //checkDatabaseVersion();
         getBuildings();
+
     }
 
     private void checkDatabaseVersion() {
